@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engagement Triage Case Study</title>
+<meta name="description" content="How Atif Osmani replaced three manual engagement workflows with one AI-assisted pipeline at Microsoft, plus a reusable template.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Case study · Shipped</span>
+      <h1>One tracker instead of three: AI-assisted engagement triage</h1>
+      <p>At Microsoft I rebuilt how a Corporate Vice President's office handled engagement requests. Three manual workflows became one pipeline, and per-engagement update time fell 80%.</p>
+      <div class="meta"><span>Where <b>Microsoft Security Marketing</b></span><span>When <b>2025–2026</b></span><span>My role <b>Designed and built it</b></span><span>Stack <b>Power Automate · AI Builder · SharePoint</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> Requests for the CVP came in as email threads and were tracked in three separate manual workflows. I built one pipeline on tools the team already used: AI pulls the facts out of each request, a Monday digest surfaces what needs a decision, and declines get drafted for a person to edit and send. Update time per engagement fell 80%. The <a href="https://github.com/AOSMANI123/Aosmani123.github.io/tree/main/projects/engagement-triage/template" target="_blank" rel="noopener">template</a> is open for anyone to reuse.</p></div>
+
+  <h2>The problem</h2>
+  <p>I was on the executive staff for the CVP of a roughly 150-person marketing organization. Engagement requests (speaking invitations, customer meetings, events) arrived as email threads. Keeping track of them took three separate manual workflows, so every update meant re-keying the same facts.</p>
+  <p>The slow part wasn't storing requests. It was reading them. Someone had to open each thread and pull out the event, the date, who was asking and what they wanted before anyone could make a call.</p>
+
+  <h2>The constraint I designed around</h2>
+  <p>These requests go to a senior executive. A wrong date or a made-up detail in a brief costs more than the time the automation saves. So the rule was set before anything was built: <b>the human is always the final sender.</b> AI can read, extract, summarize and draft. A person decides and sends.</p>
+
+  <h2>Options on the table</h2>
+  <div class="options">
+    <div class="option"><span class="label">Option A</span><h3>Tighten the manual process</h3><p>One spreadsheet, stricter habits. No new tools, but it keeps the reading bottleneck.</p></div>
+    <div class="option"><span class="label">Option B</span><h3>Adopt a dedicated tool</h3><p>An event or CRM product. More features, but a new system to procure and learn.</p></div>
+    <div class="option chosen"><span class="label">Option C · Chosen</span><h3>Build on what the team used</h3><p>Outlook, SharePoint and Power Automate were already in daily use, with AI Builder added for the reading.</p></div>
+  </div>
+
+  <h2>What I built</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Piece</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Intake</td><td>AI Builder prompts read each new request and fill a SharePoint List: event name, date, requestor, organization, industry, a short summary and a suggested next step.</td></tr>
+      <tr><td>Views</td><td>One list, filtered for each reader: Triage, Schedule, a Chief of Staff view, a Production tracker and All items.</td></tr>
+      <tr><td>Monday digest</td><td>Two emails every Monday. One lists open requests that need a decision, each with its summary. The other is the decline queue, so low-fit asks clear in one sitting.</td></tr>
+      <tr><td>Drafted declines</td><td>When a request is marked for decline, AI drafts a polite reply into the Drafts folder. Staff edit it and send it from their own mailbox.</td></tr>
+      <tr><td>Brief assembly</td><td>For accepted engagements, a second flow maps the list fields into the brief template, so the document arrives mostly assembled and ready for review.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Results</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Measure</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Per-engagement update time</td><td class="num"><b>80% less</b></td></tr>
+      <tr><td>Workflows to maintain</td><td class="num">3 → 1</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The same pattern, applied again</h2>
+  <p>I used the same approach for the CVP's meeting follow-ups around RSA Conference 2026. Raw notes went into a form; AI Builder turned them into draft follow-up emails and OneNote pages in the CVP's usual recap format. A person reviewed and sent each one.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Measure</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Time per recap</td><td class="num">About 10 minutes, roughly 70% less</td></tr>
+      <tr><td>Customer follow-ups delivered in the target window</td><td class="num">11, in a standard format</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What carried forward</h2>
+  <p>At Amazon, the same design rules shaped a larger build: a seven-agent system for the CEO's engagement portfolio. The human is still the final sender, and each agent owns one stage with a clear handoff. It also pushed me to build <a href="../briefing-evals/">briefing evals</a>, a small test suite that checks whether an AI drafter invents facts it wasn't given.</p>
+
+  <h2>Use the template</h2>
+  <p>The <a href="https://github.com/AOSMANI123/Aosmani123.github.io/tree/main/projects/engagement-triage/template" target="_blank" rel="noopener">template folder</a> has a generic version you can rebuild in any Microsoft 365 tenant: the list schema, the three prompts and a setup order. None of it contains Microsoft's internal data.</p>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

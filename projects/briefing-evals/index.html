@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briefing Evals</title>
+<meta name="description" content="An open test suite that checks whether an AI briefing drafter invents facts or flags what it doesn't know. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Open-source eval · Code</span>
+      <h1>Briefing evals: does the AI make things up?</h1>
+      <p>A small test suite for the failure I worry about most in AI-drafted briefings: a confident guess where the source was silent.</p>
+      <div class="meta"><span>Type <b>Independent work</b></span><span>Language <b>Python, no dependencies</b></span><span>Cases <b>12, all fictional</b></span><span><a href="https://github.com/AOSMANI123/Aosmani123.github.io/tree/main/projects/briefing-evals" target="_blank" rel="noopener" style="color:var(--marigold)">View the code</a></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> I build systems that draft executive briefings. In a briefing, a guess is worse than a blank. This suite gives a drafter twelve fictional engagement requests, each with one trap, and scores two things: did it pull out what was there, and did it fill in what wasn't?</p></div>
+
+  <h2>Why this matters</h2>
+  <p>A briefing drafter that's right 95% of the time sounds great until you ask what the other 5% looks like. If it leaves a field blank, someone fills it in. If it invents a moderator's name or carries last year's date forward, that error can reach an executive's prep with no warning. The second failure is the one to measure.</p>
+
+  <h2>The traps</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Case</th><th>Trap</th><th>Right answer</th></tr></thead>
+    <tbody>
+      <tr><td>No moderator</td><td>Nobody is named as moderator</td><td><code>UNKNOWN</code></td></tr>
+      <tr><td>Vague crowd</td><td>"Always draws a big crowd"</td><td>Audience size <code>UNKNOWN</code>, no number</td></tr>
+      <tr><td>Last year's date</td><td>Only last year's date appears; this year's isn't set</td><td>Date <code>UNKNOWN</code></td></tr>
+      <tr><td>Forwarded</td><td>A colleague forwarded the request</td><td>The original sender, not the forwarder</td></tr>
+      <tr><td>Virtual</td><td>Online event; last year's viewership mentioned</td><td>Location "virtual," audience <code>UNKNOWN</code></td></tr>
+      <tr><td>Two events</td><td>One event is mentioned only to rule it out</td><td>The event actually being asked about</td></tr>
+      <tr><td>Range</td><td>"250-300 people"</td><td>The range, not an average</td></tr>
+      <tr><td>Open format</td><td>"Flexible on what that looks like"</td><td>Format <code>UNKNOWN</code></td></tr>
+      <tr><td>Complete</td><td>Everything is stated (control)</td><td>All nine fields</td></tr>
+      <tr><td>TBD moderator</td><td>"Moderator: TBD"</td><td><code>UNKNOWN</code></td></tr>
+      <tr><td>No signature</td><td>Signed only by "events team"</td><td>Requestor name <code>UNKNOWN</code></td></tr>
+      <tr><td>Pending venue</td><td>City known, venue pending</td><td>The city only</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>How it's scored</h2>
+  <p>The drafter returns JSON with nine fields. Each field is scored as correct, missed (said <code>UNKNOWN</code> when the answer was there), wrong, or fabricated (filled in when the source was silent). The scorer also flags any number in the output that doesn't appear in the source.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Metric</th><th>Question it answers</th></tr></thead>
+    <tbody>
+      <tr><td>Recall on known fields</td><td>Did it pull out what was actually there?</td></tr>
+      <tr><td>Fabrication rate</td><td>Of the fields that were missing, how many did it fill in anyway?</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The experiment</h2>
+  <p>Same cases, two prompts. The naive one says "fill in the briefing details." The other states the rules I actually use: only this event, <code>UNKNOWN</code> when it isn't stated, the forwarder isn't the requestor, copy numbers as written.</p>
+  <p><span class="pill hyp">Hypothesis</span> The naive prompt fills in missing fields. Explicit rules bring fabrication close to zero without hurting recall.</p>
+
+  <h2>Results so far</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Drafter</th><th>Recall</th><th>Fabrication</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Faithful mock (checks the scorer)</td><td class="num">96/96</td><td class="num">0/12</td><td><span class="pill yes">Verified</span></td></tr>
+      <tr><td>Fabricating mock (checks the scorer)</td><td class="num">96/96</td><td class="num">12/12 caught</td><td><span class="pill yes">Verified</span></td></tr>
+      <tr><td>Real model, naive prompt</td><td class="num"></td><td class="num"></td><td><span class="pill">Not yet run</span></td></tr>
+      <tr><td>Real model, rules prompt</td><td class="num"></td><td class="num"></td><td><span class="pill">Not yet run</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>The mock rows prove the scorer works: it gives a perfect drafter full marks and catches every invented value from a bad one. Real model results go here once they're run, including the cases each prompt still misses.</p>
+
+  <h2>Run it</h2>
+<pre>python3 -m unittest discover -s tests
+python3 evals.py --drafter mock-fabricator
+
+pip install anthropic
+export ANTHROPIC_API_KEY=...
+python3 evals.py --drafter anthropic --prompt prompts/naive.txt
+python3 evals.py --drafter anthropic --prompt prompts/flag_gaps.txt</pre>
+
+  <h2>Limits</h2>
+  <ul>
+    <li>Twelve cases is a starting set, not a benchmark. Next is 50+ cases based on patterns from real requests, with every detail rewritten.</li>
+    <li>Matching is simple text containment, so it can't catch an invented venue added next to the correct city.</li>
+    <li>It checks the fact block, not the prose of the briefing.</li>
+  </ul>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani · all cases are fictional</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign-up Lists for WhatsApp</title>
+<meta name="description" content="A product teardown of WhatsApp Communities and a spec for event sign-up lists. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Product teardown + spec</span>
+      <h1>Who's bringing what? Sign-up lists for WhatsApp Communities</h1>
+      <p>WhatsApp can tell an organizer who's coming. It can't tell them who's doing what. This is a teardown of how Communities handles events today and a spec for closing that gap.</p>
+      <div class="meta"><span>Type <b>Independent spec work</b></span><span>Written <b>September 2026</b></span><span>Status <b>Not validated with users yet</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> Events in WhatsApp now cover dates, RSVPs, plus-ones and reminders. The missing piece is the ask: who's on setup, who's bringing plates, who's driving. Organizers seem to handle that in chat or with outside sign-up apps. I'd add sign-up lists to events, measured on community stickiness with guardrails on notification fatigue. Everything below that isn't sourced is labeled as a hypothesis.</p></div>
+
+  <h2>Why I picked this</h2>
+  <p>I know community organizing from the board of Muslims for Progressive Values. The same coordination problem shows up for schools, neighborhoods, sports teams and faith groups. That's exactly who WhatsApp built Communities for. Meta's mission is to build the future of human connection and the technology that makes it possible, and this is connection in its most practical form: showing up for each other.</p>
+
+  <h2>What Communities does today</h2>
+  <p>Built from WhatsApp's own announcements and launch coverage.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>When</th><th>What shipped</th><th>What it tells me</th></tr></thead>
+    <tbody>
+      <tr><td class="num">November 2022</td><td>Communities launch: an announcement group plus sub-groups, admin controls, polls, groups up to 1,024 people</td><td>Built for real-world groups whose members already know each other</td></tr>
+      <tr><td class="num">May 2024</td><td>Events in community groups: anyone can create one, members RSVP, reminders when it's close. Replies in announcement groups</td><td>Planning moved into the product</td></tr>
+      <tr><td class="num">April 2025</td><td>Events in 1:1 chats, "maybe" RSVPs, plus-ones, end times, pinned events</td><td>Steady investment in the event object</td></tr>
+      <tr><td class="num">January 2026</td><td>Member tags ("Anna's Dad," "Goalkeeper") and custom event reminders</td><td>WhatsApp is starting to model roles inside groups</td></tr>
+    </tbody>
+  </table></div>
+  <p>None of these announcements mention sign-up lists, task claiming or volunteer slots. Member tags are the closest thing: they describe who someone is in a group, not what they've signed up to do for a specific event.</p>
+
+  <h2>The gap</h2>
+  <p>An event answers "who's coming?" It doesn't answer "who's doing what?" For most community events, the second question is where the work is.</p>
+  <h3>Evidence the job exists</h3>
+  <ul>
+    <li>There's a whole category of standalone sign-up and potluck apps built for this one job. Buyer's guides list at least seven for potlucks alone.</li>
+    <li>Nonprofit tooling guides describe volunteer coordination over WhatsApp as its own problem to solve with outside tools.</li>
+  </ul>
+  <h3>Workarounds I'd expect to find <span class="pill hyp">Hypothesis</span></h3>
+  <ul>
+    <li>A numbered list pasted into chat that each person copies, edits and reposts. It gets out of order fast.</li>
+    <li>Polls used as sign-ups. That works until a slot needs a cap ("two people on setup").</li>
+    <li>A link to an outside form, which means leaving the chat and often a login.</li>
+  </ul>
+  <p>These need to be checked with organizers before anything gets built. That's the first step in the plan below.</p>
+
+  <h2>Users and jobs</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Who</th><th>Job</th><th>What goes wrong today</th></tr></thead>
+    <tbody>
+      <tr><td>Organizer</td><td>Get every role covered without chasing people one by one</td><td>Can't see gaps at a glance; ends up messaging people privately</td></tr>
+      <tr><td>Member</td><td>Know what's needed and claim something quickly</td><td>The ask gets buried under 80 messages</td></tr>
+      <tr><td>Admin</td><td>Keep the community active without spamming it</td><td>Every coordination message pings everyone</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Riskiest assumptions</h2>
+  <ol>
+    <li><b>Organizers want this inside WhatsApp.</b> They might prefer a spreadsheet they control. Test: interviews with 10 to 12 community organizers across schools, faith groups and sports teams.</li>
+    <li><b>Clear asks bring members back.</b> The DAU thesis depends on it. Test: compare activity for members who claimed a slot against similar members who didn't, in the pilot.</li>
+    <li><b>It won't add noise.</b> A list update could ping everyone. Test: mute and leave rates in the holdback test.</li>
+  </ol>
+
+  <h2>Options I considered</h2>
+  <div class="options">
+    <div class="option"><span class="label">Option A</span><h3>Upgrade polls</h3><p>Add names and caps to poll options. Cheapest, but polls are for opinions. Stretching them muddles both jobs.</p></div>
+    <div class="option chosen"><span class="label">Option B · Chosen</span><h3>Sign-up lists on events</h3><p>Slots live on the event people already RSVP to. One place for who's coming and who's doing what.</p></div>
+    <div class="option"><span class="label">Option C</span><h3>Integrate outside apps</h3><p>Let sign-up apps attach to events. Fast, but it sends people out of the chat and adds third-party data questions.</p></div>
+  </div>
+  <p><b>Why B:</b> the event is already the object members open and RSVP to, and reminders already exist on it. Attaching slots there adds the missing piece without teaching anyone a new surface. The tradeoff is scope: B is more work than A, and it has to respect end-to-end encryption the way polls and events already do.</p>
+
+  <h2>The spec</h2>
+  <h3>Goal</h3>
+  <p>Help organizers get every role covered without leaving the chat, and give members a clear, low-effort way to contribute.</p>
+  <h3>Non-goals</h3>
+  <ul>
+    <li>Payments, ticketing or anything that turns an event into a transaction.</li>
+    <li>Recurring volunteer scheduling. One event at a time for v1.</li>
+    <li>Lists outside of events.</li>
+  </ul>
+  <h3>Requirements</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Priority</th><th>Requirement</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill yes">P0</span></td><td>Event creator can add a sign-up list with named slots and an optional cap per slot ("Setup, 2 people")</td></tr>
+      <tr><td><span class="pill yes">P0</span></td><td>Members claim or unclaim a slot in one tap from the event card</td></tr>
+      <tr><td><span class="pill yes">P0</span></td><td>Anyone can see which slots are open or full at a glance</td></tr>
+      <tr><td><span class="pill yes">P0</span></td><td>Claims don't notify the whole group. Only the organizer gets a quiet summary</td></tr>
+      <tr><td><span class="pill yes">P0</span></td><td>End-to-end encrypted, like polls and events. Names shown only to people already in the group</td></tr>
+      <tr><td><span class="pill">P1</span></td><td>Organizer nudge for open slots, sent to members who RSVP'd yes but haven't claimed anything</td></tr>
+      <tr><td><span class="pill">P1</span></td><td>Claimed slot appears in the member's event reminder ("You're on setup")</td></tr>
+      <tr><td><span class="pill">P2</span></td><td>Templates for common lists: potluck, volunteer shifts, carpool</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Edge cases</h3>
+  <ul>
+    <li>A member leaves the group after claiming a slot: the slot reopens and the organizer is told.</li>
+    <li>Two people tap the last spot at once: first confirmed claim wins; the other sees "just filled."</li>
+    <li>Older app versions: show the list as read-only text with a prompt to update.</li>
+  </ul>
+
+  <h2>How I'd measure it</h2>
+  <p class="note">These are planned metrics and targets, not results. Nothing here has shipped.</p>
+  <p>Test at the community level with a holdback group for eight weeks, since novelty can make week one look better than it is.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Type</th><th>Metric</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Success</td><td>DAU/MAU and L28 active days for members of test communities vs. holdback</td><td>Stickiness, not raw DAU, which a notification can inflate</td></tr>
+      <tr><td>Driver</td><td>Share of communities that attach a list within 28 days</td><td>Do organizers adopt it?</td></tr>
+      <tr><td>Driver</td><td>Share of RSVP'd members who claim a slot; slots filled before the event</td><td>Does it get roles covered?</td></tr>
+      <tr><td>Driver</td><td>Messages in the event's group in the week after it</td><td>Did it create real conversation, not just a tap?</td></tr>
+      <tr><td>Guardrail</td><td>Mute and leave rates, notification opt-outs, spam reports</td><td>Growth that annoys people isn't growth</td></tr>
+      <tr><td>Guardrail</td><td>D28 retention, not D1</td><td>Novelty fades</td></tr>
+      <tr><td>Health</td><td>Repeat use by organizers across events</td><td>Organizers bring everyone else back</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Decision rule, set before launch:</b> ship if test communities show a significant stickiness gain that holds through week eight, with no guardrail regression. Writing the rule first keeps us from rationalizing whatever the data shows.</p>
+
+  <h2>Rollout</h2>
+  <ol>
+    <li>Interviews with 10 to 12 organizers to check the workarounds and the "inside WhatsApp" assumption.</li>
+    <li>Prototype test with a handful of real communities.</li>
+    <li>Holdback test in a few markets where Communities use is high.</li>
+    <li>Broad launch only if the decision rule is met.</li>
+  </ol>
+
+  <h2>What I don't know</h2>
+  <ul>
+    <li>How many community events actually need roles covered, versus just a headcount.</li>
+    <li>Whether WhatsApp is already testing something like this internally.</li>
+    <li>How organizers in different markets handle this today. My own view is mostly US nonprofit and community groups.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <ul class="sources">
+    <li><a href="https://techcrunch.com/2022/11/03/whatsapp-officially-launches-its-new-discussion-group-feature-communities" target="_blank" rel="noopener">WhatsApp officially launches Communities (TechCrunch, November 2022)</a></li>
+    <li><a href="https://blog.whatsapp.com/new-to-communities-events-and-replies-in-announcement-groups" target="_blank" rel="noopener">New to Communities: Events and Replies in Announcement Groups (WhatsApp Blog, May 2024)</a></li>
+    <li><a href="https://blog.whatsapp.com/new-feature-roundup-updates-to-group-chats-events-calls-channels-and-more" target="_blank" rel="noopener">New Feature Roundup: group chats, events, calls, channels (WhatsApp Blog, April 2025)</a></li>
+    <li><a href="https://www.thurrott.com/cloud/331453/whatsapp-improves-its-groups-feature-with-member-tags-and-event-reminders" target="_blank" rel="noopener">WhatsApp adds member tags and event reminders (Thurrott, January 2026)</a></li>
+    <li><a href="https://techcrunch.com/2025/05/01/whatsapp-now-has-more-than-3-billion-users/" target="_blank" rel="noopener">WhatsApp now has more than 3 billion users a month (TechCrunch, May 2025)</a></li>
+    <li><a href="https://www.signupready.com/blog/best-potluck-apps-2026" target="_blank" rel="noopener">Best potluck planning apps in 2026 (SignUpReady)</a></li>
+    <li><a href="https://secondtick.com/whatsapp-volunteer-coordination-tools/" target="_blank" rel="noopener">WhatsApp volunteer coordination tools for nonprofits (Second Tick)</a></li>
+  </ul>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani · independent work, not affiliated with Meta or WhatsApp</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

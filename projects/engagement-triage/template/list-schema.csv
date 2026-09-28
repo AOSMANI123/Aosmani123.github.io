@@ -1,0 +1,13 @@
+column,type,filled_by,notes
+Title,Single line of text,AI (Flow 1),Event name as stated in the request
+Event Date,Date,AI (Flow 1),Leave blank if not stated. Never infer from past years
+Requestor Name,Single line of text,AI (Flow 1),The person asking on behalf of the event (not a forwarder)
+Requestor Email,Single line of text,AI (Flow 1),
+Requestor Org,Single line of text,AI (Flow 1),
+Industry,Choice,AI (Flow 1),Keep the choice list short (8-10 values) so the prompt can pick reliably
+AI Summary,Multiple lines of text,AI (Flow 1),Two to three sentences: what is being asked and by whom
+AI Next Step,Multiple lines of text,AI (Flow 1),A suggestion only. A person sets Status
+Status,Choice,Person,New / Needs decision / Accepted / Decline / Scheduled / Closed
+Owner,Person,Person,Who on the team is driving it
+Decision Notes,Multiple lines of text,Person,Why it was accepted or declined. Feeds future criteria
+Source Email Link,Hyperlink,Flow 1,Link back to the original thread

@@ -124,6 +124,15 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
 .record dd{margin:0;font-size:.95rem;line-height:1.5}
 .record dd.out{font-weight:600}
 
+/* projects */
+.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:30px}
+.project{display:flex;flex-direction:column;gap:10px;background:var(--sheet);border:1px solid var(--rule);padding:22px;text-decoration:none;color:var(--ink);min-width:0;transition:border-color .15s,transform .15s}
+.project:hover{border-color:var(--teal);transform:translateY(-2px)}
+.project h3{font-size:1.22rem;line-height:1.25}
+.project p{font-size:.94rem;color:var(--muted)}
+.project .go{margin-top:auto;font-family:var(--mono);font-size:.76rem;color:var(--teal)}
+.project .kind{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+
 /* principles */
 .principles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 44px;margin-top:30px}
 .principle{min-width:0}
@@ -169,6 +178,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
   .arrow{transform:rotate(90deg);justify-self:center}
   .case{grid-template-columns:1fr}
   .outside{grid-template-columns:1fr}
+  .projects{grid-template-columns:1fr}
 }
 @media (max-width:640px){
   .records,.principles,.steps{grid-template-columns:1fr}
@@ -190,6 +200,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
         <a href="#method">How I work</a>
         <a href="#builds">Builds</a>
         <a href="#decisions">Decisions</a>
+        <a href="#projects">Projects</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
       </nav>
@@ -230,7 +241,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
       <div class="case">
         <dl>
           <div><dt>The problem</dt><dd>The CEO's external engagement portfolio runs to 200+ items at a time. Every request needed the same intake, triage and briefing work, done by hand, with no written criteria for what to accept.</dd></div>
-          <div><dt>My role</dt><dd>I owned the portfolio, and I designed and built the system on Amazon Quick Suite myself. I also wrote the evaluation criteria it ranks against.</dd></div>
+          <div><dt>My role</dt><dd>I owned the portfolio, and I designed and built the system on Amazon Quick Suite myself. I also wrote the portfolio's first evaluation criteria.</dd></div>
         </dl>
         <dl>
           <div><dt>Discovery</dt><dd>25 interviews with product managers, engineering managers and comms and PR leads about where executive workflows actually break.</dd></div>
@@ -328,13 +339,41 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
     </div>
   </section>
 
+  <section class="row" id="projects">
+    <span class="label">Projects</span>
+    <div>
+      <h2>Work you can open</h2>
+      <p class="intro">One shipped case study, one product spec and one piece of working code. Anything not yet tested with users or run against a real model is labeled that way.</p>
+      <div class="projects">
+        <a class="project" href="projects/engagement-triage/">
+          <span class="kind">Case study · Shipped</span>
+          <h3>One tracker instead of three</h3>
+          <p>How I replaced three manual engagement workflows at Microsoft with one AI-assisted pipeline, plus an open template to rebuild it.</p>
+          <span class="go">Read the case study →</span>
+        </a>
+        <a class="project" href="projects/whatsapp-signups/">
+          <span class="kind">Teardown + spec</span>
+          <h3>Sign-up lists for WhatsApp Communities</h3>
+          <p>WhatsApp can tell an organizer who's coming, not who's doing what. A teardown, three options, a spec and a metrics plan.</p>
+          <span class="go">Read the spec →</span>
+        </a>
+        <a class="project" href="projects/briefing-evals/">
+          <span class="kind">Open-source eval · Code</span>
+          <h3>Briefing evals</h3>
+          <p>Twelve fictional requests, each with a trap, that test whether an AI briefing drafter invents facts or flags what's missing.</p>
+          <span class="go">See the evals →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="row" id="principles">
     <span class="label">Principles</span>
     <div>
       <h2>What I hold to</h2>
       <div class="principles">
         <div class="principle"><h3>The human is always the final sender.</h3><p>AI drafts, sorts and retrieves. A person reads it and decides. Every system I've built works this way.</p></div>
-        <div class="principle"><h3>Write the criteria before you rank anything.</h3><p>A priority list without criteria is just the loudest request winning. At Amazon, the triage agent ranks requests against criteria I wrote.</p></div>
+        <div class="principle"><h3>Write the criteria before you rank anything.</h3><p>A priority list without criteria is just the loudest request winning. At Amazon, I wrote the evaluation criteria the portfolio had never had.</p></div>
         <div class="principle"><h3>Put the ask up top.</h3><p>Busy people read the first line. The decision you need goes there, and the context follows for anyone who wants it.</p></div>
         <div class="principle"><h3>Don't fill in what you don't know.</h3><p>In a briefing, a guess dressed up as a fact does more damage than a gap. I flag the gap and go find the answer.</p></div>
       </div>
