@@ -4,140 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atif Osmani</title>
-<meta name="description" content="Atif Osmani: product-minded operator. Discovery first, then the constraint, then the build.">
+<meta name="description" content="Atif Osmani builds AI systems and operating models for executive teams. He starts with the users and finds the constraint before he builds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Layout: a product spec. A left margin rail carries field labels (the way a PRD names its fields); content runs in the right column. One highlighter mark is the only loud element. */
+/* Layout: an indigo title band, then a working notebook. A narrow margin rail labels each section the way a spec labels its fields. Marigold is used only to mark the thing that matters. */
 :root{
-  --paper:#F5F6F8;
-  --sheet:#FFFFFF;
-  --ink:#141820;
-  --muted:#586170;
-  --rule:#D8DCE3;
-  --accent:#2B47C9;
-  --accent-soft:#E6EAFA;
-  --marker:#FBE27A;
-  --display:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;
-  --body:'Source Serif 4',Georgia,'Times New Roman',serif;
-  --mono:'DM Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-  --rail:11rem;
+  --paper:#EEEFEA;
+  --sheet:#FAFAF7;
+  --ink:#1B1F33;
+  --muted:#565B6B;
+  --rule:#D5D7D0;
+  --indigo:#1D2340;
+  --on-indigo:#EDEBE3;
+  --on-indigo-muted:#B9B8C8;
+  --marigold:#E4A62A;
+  --mark-bg:#F2C866;
+  --teal:#1C605B;
+  --teal-soft:#DCE9E6;
+  --display:'Young Serif',Georgia,'Times New Roman',serif;
+  --body:'Public Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'DM Mono',ui-monospace,Menlo,monospace;
+  --rail:10.5rem;
   --maxw:66rem;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#101318;--sheet:#171B22;--ink:#E8EBF0;--muted:#9BA4B2;--rule:#2A303A;
-  --accent:#93A6FF;--accent-soft:#1E2640;--marker:#6B5A12;color-scheme:dark}}
+  --paper:#12152A;--sheet:#191D34;--ink:#E9E8E1;--muted:#A3A5B6;--rule:#2B3049;
+  --indigo:#0C0F20;--on-indigo:#EDEBE3;--on-indigo-muted:#A9A8BA;
+  --marigold:#E9B447;--mark-bg:#7A5A12;--teal:#78C4BA;--teal-soft:#1B3431;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#101318;--sheet:#171B22;--ink:#E8EBF0;--muted:#9BA4B2;--rule:#2A303A;
-  --accent:#93A6FF;--accent-soft:#1E2640;--marker:#6B5A12;color-scheme:dark}
+  --paper:#12152A;--sheet:#191D34;--ink:#E9E8E1;--muted:#A3A5B6;--rule:#2B3049;
+  --indigo:#0C0F20;--on-indigo:#EDEBE3;--on-indigo-muted:#A9A8BA;
+  --marigold:#E9B447;--mark-bg:#7A5A12;--teal:#78C4BA;--teal-soft:#1B3431;color-scheme:dark}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.075rem;line-height:1.62;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.05rem;line-height:1.65;-webkit-font-smoothing:antialiased}
 .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
-a{color:var(--accent);text-underline-offset:3px}
-a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
-h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+a{color:var(--teal);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--marigold);outline-offset:3px;border-radius:2px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
 p{margin:0}
-.label{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 88%,transparent 88%);color:inherit;padding:0 .08em}
+.label{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
 
-/* top bar */
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:22px;border-bottom:1px solid var(--rule)}
-.top .who{font-family:var(--display);font-weight:700;font-size:1.05rem}
+/* title band */
+.band{background:var(--indigo);color:var(--on-indigo)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:22px;border-bottom:1px solid rgba(237,235,227,.16)}
+.top .who{font-family:var(--mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase}
 .top nav{display:flex;gap:22px;flex-wrap:wrap}
-.top nav a{font-family:var(--mono);font-size:.8rem;color:var(--muted);text-decoration:none}
-.top nav a:hover{color:var(--accent)}
-
-/* hero */
-.hero{padding-block:clamp(48px,8vw,96px) clamp(40px,6vw,72px)}
-.hero h1{font-size:clamp(2.4rem,6.4vw,4.6rem);font-weight:800;line-height:1.02;max-width:14ch}
-.hero .lede{max-width:40rem;font-size:1.22rem;color:var(--muted);margin-top:26px}
-.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:44px}
-.facts div{background:var(--sheet);padding:14px 16px;min-width:0}
-.facts b{display:block;font-family:var(--display);font-weight:600;font-size:1rem;margin-top:4px}
+.top nav a{font-family:var(--mono);font-size:.78rem;color:var(--on-indigo-muted);text-decoration:none}
+.top nav a:hover{color:var(--marigold)}
+.hero{padding-block:clamp(52px,8vw,100px) clamp(44px,6vw,76px)}
+.hero .label{color:var(--marigold)}
+.hero h1{font-size:clamp(2.5rem,6.6vw,4.7rem);line-height:1.05;max-width:13ch;margin-top:18px}
+.hero h1 em{font-style:normal;color:var(--marigold)}
+.hero .lede{max-width:38rem;font-size:1.2rem;color:var(--on-indigo-muted);margin-top:26px}
+.hero .lede b{color:var(--on-indigo);font-weight:500}
+.facts{display:flex;flex-wrap:wrap;gap:10px 34px;margin-top:40px;padding-top:18px;border-top:1px solid rgba(237,235,227,.16);font-family:var(--mono);font-size:.8rem;color:var(--on-indigo-muted)}
+.facts b{color:var(--on-indigo);font-weight:500}
+.facts .dot{color:var(--marigold)}
 
 /* spec rows */
-.row{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:32px;padding-block:clamp(44px,6vw,72px);border-top:1px solid var(--rule)}
-.row > .label{padding-top:.5rem}
-.row h2{font-size:clamp(1.7rem,3.4vw,2.35rem);font-weight:700;line-height:1.1;margin-bottom:16px}
+.row{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:32px;padding-block:clamp(48px,6vw,80px);border-top:1px solid var(--rule)}
+.row:first-of-type{border-top:0}
+.row > .label{padding-top:.55rem}
+.row h2{font-size:clamp(1.75rem,3.4vw,2.4rem);line-height:1.15;margin-bottom:16px}
 .intro{max-width:40rem;color:var(--muted)}
+.intro + .intro{margin-top:12px}
+mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg) 86%,transparent 86%);color:inherit;padding:0 .1em}
 
 /* method */
 .steps{list-style:none;padding:0;margin:32px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
 .steps li{border-top:2px solid var(--ink);padding-top:14px;min-width:0}
-.steps .n{font-family:var(--mono);font-size:.78rem;color:var(--accent)}
-.steps h3{font-size:1.12rem;font-weight:700;margin:6px 0 8px}
-.steps p{font-size:.97rem;color:var(--muted)}
+.steps .n{font-family:var(--mono);font-size:.76rem;color:var(--teal)}
+.steps h3{font-size:1.15rem;margin:6px 0 8px}
+.steps p{font-size:.95rem;color:var(--muted)}
 
-/* flow (signature) */
-.flow{margin-top:32px;background:var(--sheet);border:1px solid var(--rule);padding:clamp(18px,3vw,30px)}
+/* case study */
+.case{margin-top:30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 40px}
+.case dl{margin:0;display:grid;gap:18px}
+.case dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:4px}
+.case dd{margin:0;font-size:.98rem}
+.flow{margin-top:34px;background:var(--sheet);border:1px solid var(--rule);padding:clamp(18px,3vw,30px)}
 .flow-grid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1.5fr);align-items:stretch;gap:14px}
 .node{border:1px solid var(--rule);padding:14px;min-width:0;background:var(--paper)}
-.node .label{font-size:.68rem}
-.node b{display:block;font-family:var(--display);font-size:1.05rem;margin:4px 0 4px}
-.node p{font-size:.9rem;color:var(--muted);line-height:1.45}
-.node.constraint{border-color:var(--accent);background:var(--accent-soft)}
-.node.constraint .label{color:var(--accent)}
+.node .label{font-size:.66rem}
+.node b{display:block;font-family:var(--display);font-weight:400;font-size:1.12rem;margin:4px 0}
+.node p{font-size:.88rem;color:var(--muted);line-height:1.45}
+.node.constraint{border-color:var(--marigold);box-shadow:inset 3px 0 0 var(--marigold)}
+.node.constraint .label{color:var(--ink)}
 .arrow{align-self:center;font-family:var(--mono);color:var(--muted);font-size:1.1rem}
 .stages{display:flex;flex-direction:column;gap:8px}
-.stage{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border:1px solid var(--rule);background:var(--paper);padding:9px 12px;font-size:.93rem}
-.stage span:last-child{font-family:var(--mono);font-size:.72rem;color:var(--muted);white-space:nowrap}
-.stage.human{border-style:dashed}
-.flow-foot{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.stage{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border:1px solid var(--rule);background:var(--paper);padding:9px 12px;font-size:.92rem}
+.stage span:last-child{font-family:var(--mono);font-size:.7rem;color:var(--muted);white-space:nowrap}
+.stage.human{border-style:dashed;border-color:var(--teal)}
+.stage.human span:first-child{color:var(--teal);font-weight:600}
+.flow-foot{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.78rem;color:var(--muted)}
 .flow-foot b{color:var(--ink);font-weight:500}
 
+/* pipeline list for case 2 */
+.pipe{list-style:none;padding:0;margin:30px 0 0;border-left:2px solid var(--rule)}
+.pipe li{position:relative;padding:0 0 18px 22px;max-width:42rem}
+.pipe li::before{content:"";position:absolute;left:-7px;top:.5rem;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--teal)}
+.pipe li.last::before{background:var(--teal)}
+.pipe b{display:block;font-weight:600}
+.pipe span{color:var(--muted);font-size:.96rem}
+.result{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:14px;padding:16px 18px;background:var(--teal-soft);max-width:42rem}
+.result .big{font-family:var(--display);font-size:2.2rem;line-height:1;color:var(--teal)}
+.result p{font-size:.96rem;flex:1;min-width:14rem}
+
 /* decision records */
-.records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:32px}
+.records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:30px}
 .record{background:var(--sheet);border:1px solid var(--rule);padding:24px;min-width:0;display:flex;flex-direction:column;gap:14px}
-.record header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.record h3{font-size:1.28rem;font-weight:700;line-height:1.2}
-.record dl{margin:0;display:grid;grid-template-columns:6.4rem minmax(0,1fr);gap:8px 14px}
-.record dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:.3rem}
-.record dd{margin:0;font-size:.97rem;line-height:1.5}
-.record dd.result{font-weight:600}
+.record header{display:flex;flex-direction:column;gap:6px}
+.record h3{font-size:1.25rem;line-height:1.25}
+.record dl{margin:0;display:grid;grid-template-columns:5.6rem minmax(0,1fr);gap:8px 14px}
+.record dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:.3rem}
+.record dd{margin:0;font-size:.95rem;line-height:1.5}
+.record dd.out{font-weight:600}
+
+/* principles */
+.principles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 44px;margin-top:30px}
+.principle{min-width:0}
+.principle h3{font-size:1.3rem;line-height:1.25;margin-bottom:8px}
+.principle p{font-size:.97rem;color:var(--muted)}
 
 /* experience */
-.xp{list-style:none;padding:0;margin:28px 0 0}
-.xp li{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:20px;padding-block:18px;border-bottom:1px solid var(--rule)}
+.xp{list-style:none;padding:0;margin:26px 0 0}
+.xp li{display:grid;grid-template-columns:9rem minmax(0,1fr);gap:20px;padding-block:18px;border-bottom:1px solid var(--rule)}
 .xp li:last-child{border-bottom:0}
-.xp .when{font-family:var(--mono);font-size:.8rem;color:var(--muted);padding-top:.25rem;font-variant-numeric:tabular-nums}
-.xp h3{font-size:1.08rem;font-weight:700}
-.xp h3 span{font-weight:500;color:var(--muted)}
-.xp p{font-size:.97rem;color:var(--muted);margin-top:4px;max-width:44rem}
-.xp .tag{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:2px 7px;margin-left:6px;vertical-align:2px}
+.xp .when{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding-top:.25rem;font-variant-numeric:tabular-nums}
+.xp h3{font-family:var(--body);font-weight:700;font-size:1.04rem}
+.xp h3 span{font-weight:400;color:var(--muted)}
+.xp p{font-size:.96rem;color:var(--muted);margin-top:4px;max-width:44rem}
+.xp .tag{display:inline-block;font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);background:var(--teal-soft);padding:2px 7px;margin-left:6px;vertical-align:2px;font-weight:400}
 
-/* beyond */
-.beyond{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:28px}
-.beyond div{min-width:0}
-.beyond h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
-.beyond p{font-size:.97rem;color:var(--muted)}
+/* outside */
+.outside{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:28px}
+.outside div{min-width:0}
+.outside h3{font-size:1.15rem;margin-bottom:6px}
+.outside p{font-size:.95rem;color:var(--muted)}
+.listening{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.listening b{color:var(--ink);font-weight:500}
 
 /* contact */
-.contact{padding-block:clamp(56px,8vw,96px);border-top:1px solid var(--rule)}
-.contact h2{font-size:clamp(2rem,4.6vw,3.2rem);font-weight:800;line-height:1.05;max-width:18ch}
-.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;align-items:center}
-.links a,.copy{font-family:var(--mono);font-size:.86rem;text-decoration:none;border:1px solid var(--ink);color:var(--ink);background:transparent;padding:11px 16px;cursor:pointer;transition:background .15s,color .15s}
-.links a:hover,.copy:hover{background:var(--ink);color:var(--paper)}
-.links a.primary{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
-.links a.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.email{font-family:var(--mono);font-size:.86rem;user-select:all;padding:11px 4px}
-.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-block:22px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.contact{background:var(--indigo);color:var(--on-indigo);padding-block:clamp(56px,8vw,96px)}
+.contact .label{color:var(--marigold)}
+.contact h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1.08;max-width:18ch;margin-top:14px}
+.contact p{color:var(--on-indigo-muted);max-width:36rem;margin-top:16px}
+.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;align-items:center}
+.links a,.copy{font-family:var(--mono);font-size:.84rem;text-decoration:none;border:1px solid rgba(237,235,227,.4);color:var(--on-indigo);background:transparent;padding:11px 16px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.links a:hover,.copy:hover{background:var(--on-indigo);color:var(--indigo);border-color:var(--on-indigo)}
+.links a.primary{background:var(--marigold);border-color:var(--marigold);color:#1B1F33}
+.links a.primary:hover{background:var(--on-indigo);border-color:var(--on-indigo)}
+.email{font-family:var(--mono);font-size:.84rem;user-select:all;padding:11px 4px;color:var(--on-indigo)}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:56px;padding-top:20px;border-top:1px solid rgba(237,235,227,.16);font-family:var(--mono);font-size:.72rem;color:var(--on-indigo-muted)}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-
 @media (max-width:900px){
   .row{grid-template-columns:1fr;gap:10px}
   .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
   .flow-grid{grid-template-columns:1fr}
   .arrow{transform:rotate(90deg);justify-self:center}
-  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .beyond{grid-template-columns:1fr}
+  .case{grid-template-columns:1fr}
+  .outside{grid-template-columns:1fr}
 }
 @media (max-width:640px){
-  .records{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr}
+  .records,.principles,.steps{grid-template-columns:1fr}
   .xp li{grid-template-columns:1fr;gap:4px}
   .record dl{grid-template-columns:1fr;gap:2px}
   .record dd{margin-bottom:8px}
@@ -148,61 +182,73 @@ mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 
 <body>
 
 
-<div class="wrap">
-  <div class="top">
-    <span class="who">Atif Osmani</span>
-    <nav aria-label="Sections">
-      <a href="#method">Method</a>
-      <a href="#build">The build</a>
-      <a href="#decisions">Decisions</a>
-      <a href="#experience">Experience</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </div>
-
-  <header class="hero">
-    <span class="label">Product-minded operator · Amazon CEO Communications</span>
-    <h1 style="margin-top:18px">I find the <mark>constraint</mark> before I build.</h1>
-    <p class="lede">Five years inside two CEO offices, supporting Andy Jassy at Amazon and Satya Nadella at Microsoft. I talk to the users first, scope to the real constraint, ship, and then measure whether it moved. I do my best work where the prioritization criteria don't exist yet and someone has to write them.</p>
-    <div class="facts">
-      <div><span class="label">Now</span><b>Amazon, CEO Comms</b></div>
-      <div><span class="label">Before</span><b>Microsoft, Office of the CEO</b></div>
-      <div><span class="label">Trained</span><b>Microsoft ACE rotation</b></div>
-      <div><span class="label">Based</span><b>Seattle → New York</b></div>
+<div class="band">
+  <div class="wrap">
+    <div class="top">
+      <span class="who">Atif Osmani</span>
+      <nav aria-label="Sections">
+        <a href="#method">How I work</a>
+        <a href="#builds">Builds</a>
+        <a href="#decisions">Decisions</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
     </div>
-  </header>
+    <header class="hero">
+      <span class="label">Product · AI systems · Executive operations</span>
+      <h1>I find the <em>constraint</em> before I build.</h1>
+      <p class="lede">I've spent five years inside two CEO offices, supporting <b>Andy Jassy at Amazon</b> and <b>Satya Nadella at Microsoft</b>. The work that keeps pulling me in is the same every time: a team with a messy process and no criteria for what matters. I talk to the people doing the work, find what's actually in the way, and build the system around it.</p>
+      <div class="facts">
+        <span><span class="dot">●</span> Now <b>Amazon, CEO Communications</b></span>
+        <span>Before <b>Microsoft, Office of the CEO</b></span>
+        <span>Trained <b>Microsoft ACE rotation</b></span>
+        <span>Moving <b>Seattle → New York</b></span>
+      </div>
+    </header>
+  </div>
+</div>
 
+<main class="wrap">
   <section class="row" id="method">
-    <span class="label">Method</span>
+    <span class="label">How I work</span>
     <div>
-      <h2>How I work a problem</h2>
-      <p class="intro">The same four steps, whether the product is an AI system, a research study, or a meeting nobody wanted to sit through.</p>
+      <h2>Four steps, in this order</h2>
+      <p class="intro">It's the same whether I'm building an AI system, designing a research study or fixing a meeting nobody wanted to be in.</p>
       <ol class="steps">
-        <li><span class="n">Step 1</span><h3>Interview the users</h3><p>25 structured discovery interviews in my first six weeks at Amazon, across product, engineering, internal comms and PR.</p></li>
-        <li><span class="n">Step 2</span><h3>Find the real constraint</h3><p>The interviews surfaced it: the platform exposed no write APIs. Everything after that was designed around it.</p></li>
-        <li><span class="n">Step 3</span><h3>Ship</h3><p>A working seven-agent system within eight weeks of joining, handling a 200+ item portfolio.</p></li>
-        <li><span class="n">Step 4</span><h3>Measure whether it moved</h3><p>Coverage, volume and false positives for monitoring. Update time for tracking, which fell 80% at Microsoft.</p></li>
+        <li><span class="n">Step 1</span><h3>Talk to the users</h3><p>At Amazon I ran 25 discovery interviews in my first six weeks, across product, engineering, internal comms and PR.</p></li>
+        <li><span class="n">Step 2</span><h3>Find the real constraint</h3><p>Usually it's one thing. At Amazon it was that the platform had no write APIs. Everything after that was designed around it.</p></li>
+        <li><span class="n">Step 3</span><h3>Ship something that works</h3><p>A seven-agent system was running within eight weeks of my start date.</p></li>
+        <li><span class="n">Step 4</span><h3>Check whether it moved</h3><p>Coverage and false positives for media monitoring. Update time for engagement tracking, which fell 80% at Microsoft.</p></li>
       </ol>
     </div>
   </section>
 
-  <section class="row" id="build">
-    <span class="label">The build</span>
+  <section class="row" id="builds">
+    <span class="label">Build 01 · Amazon</span>
     <div>
       <h2>A seven-agent system for the CEO's engagements</h2>
-      <p class="intro">The CEO's external engagement portfolio runs to 200+ items at a time. I built an AI system on Amazon Quick Suite to take the repeatable work off the team. Its scope came straight from the discovery interviews.</p>
-      <div class="flow" role="figure" aria-label="Discovery interviews led to a platform constraint, which shaped four agent stages that end with a human reviewer">
+      <div class="case">
+        <dl>
+          <div><dt>The problem</dt><dd>The CEO's external engagement portfolio runs to 200+ items at a time. Every request needed the same intake, triage and briefing work, done by hand, with no written criteria for what to accept.</dd></div>
+          <div><dt>My role</dt><dd>I owned the portfolio, and I designed and built the system on Amazon Quick Suite myself. I also wrote the evaluation criteria it ranks against.</dd></div>
+        </dl>
+        <dl>
+          <div><dt>Discovery</dt><dd>25 interviews with product managers, engineering managers and comms and PR leads about where executive workflows actually break.</dd></div>
+          <div><dt>The tradeoff</dt><dd>The platform could read but not write. So the agents do the drafting and the finding, and <mark>a person always makes the final call</mark>.</dd></div>
+        </dl>
+      </div>
+      <div class="flow" role="figure" aria-label="Discovery interviews led to a platform constraint, which shaped four agent stages ending with human review">
         <div class="flow-grid">
           <div class="node">
             <span class="label">Discovery</span>
             <b>25 interviews</b>
-            <p>Product managers, engineering managers, comms and PR leads. Where do executive workflows actually break?</p>
+            <p>PMs, engineering managers, comms and PR leads.</p>
           </div>
           <span class="arrow" aria-hidden="true">→</span>
           <div class="node constraint">
             <span class="label">Constraint</span>
             <b>No write APIs</b>
-            <p>The platform could read but not write. The system drafts and retrieves; people commit.</p>
+            <p>The system drafts and retrieves. People commit.</p>
           </div>
           <span class="arrow" aria-hidden="true">→</span>
           <div class="stages">
@@ -216,53 +262,81 @@ mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 
         <div class="flow-foot">
           <span>Agents <b>7</b></span>
           <span>Portfolio <b>200+ items</b></span>
-          <span>Time to ship <b>8 weeks from joining</b></span>
+          <span>Shipped <b>within 8 weeks of joining</b></span>
           <span>Platform <b>Amazon Quick Suite</b></span>
         </div>
       </div>
     </div>
   </section>
 
+  <section class="row">
+    <span class="label">Build 02 · Microsoft</span>
+    <div>
+      <h2>One tracker instead of three manual workflows</h2>
+      <p class="intro">Engagement requests for a Corporate Vice President came in through three separate manual workflows. I rebuilt it as one pipeline in Power Automate, AI Builder and SharePoint.</p>
+      <ol class="pipe">
+        <li><b>Requests land in one list</b><span>AI Builder pulls the event, date, requestor and organization out of each email and writes a short summary.</span></li>
+        <li><b>Monday digest</b><span>Open requests that need a decision arrive in one email, each with its summary, so nobody has to open every thread.</span></li>
+        <li><b>Drafted declines</b><span>Low-fit requests get a polite draft reply. Staff edit and send it themselves.</span></li>
+        <li class="last"><b>Briefs for accepted engagements</b><span>A second flow pre-assembles the briefing document from the list, ready for review.</span></li>
+      </ol>
+      <div class="result"><span class="big">80%</span><p>less time to update each engagement, and one place to see all of them.</p></div>
+    </div>
+  </section>
+
   <section class="row" id="decisions">
     <span class="label">Decisions</span>
     <div>
-      <h2>Decision records</h2>
-      <p class="intro">Four calls, written the way I would write them up for a product review: what was wrong, what I looked at, and what changed.</p>
+      <h2>Calls I've made, written up</h2>
+      <p class="intro">Four decisions in the format I'd bring to a product review: the question, how I looked at it, and what came out.</p>
       <div class="records">
         <article class="record">
-          <header><h3>Build or buy media monitoring</h3><span class="label">Amazon · 2026</span></header>
+          <header><span class="label">Amazon · 2026</span><h3>Build or buy media monitoring</h3></header>
           <dl>
-            <dt>Question</dt><dd>Is the incumbent agency feed worth keeping, or can the team run its own?</dd>
-            <dt>Method</dt><dd>Ran a self-built pipeline in parallel with the agency feed for three weeks.</dd>
+            <dt>Question</dt><dd>Keep the incumbent agency feed, or run our own?</dd>
+            <dt>Method</dt><dd>Ran a self-built pipeline next to the agency feed for three weeks.</dd>
             <dt>Measured</dt><dd>Coverage, volume and false positives, side by side.</dd>
-            <dt>Result</dt><dd class="result">Readout and recommendation delivered to the team's leadership.</dd>
+            <dt>Outcome</dt><dd class="out">Readout and recommendation delivered to the team's leadership.</dd>
           </dl>
         </article>
         <article class="record">
-          <header><h3>Criteria for a portfolio that had none</h3><span class="label">Amazon · 2026</span></header>
+          <header><span class="label">Amazon · 2026</span><h3>Criteria for a portfolio that had none</h3></header>
           <dl>
-            <dt>Problem</dt><dd>200+ engagement requests for the CEO and no written basis for saying yes or no.</dd>
+            <dt>Problem</dt><dd>200+ CEO engagement requests and no written basis for yes or no.</dd>
             <dt>Decision</dt><dd>Wrote the evaluation criteria and set four milestone gates per engagement.</dd>
             <dt>Cadence</dt><dd>An agenda-driven weekly review replaced an open-ended status meeting.</dd>
-            <dt>Result</dt><dd class="result">A weekly decision update to senior Corporate Affairs leaders, with week-over-week visibility into what moved.</dd>
+            <dt>Outcome</dt><dd class="out">A weekly decision update for senior Corporate Affairs leaders.</dd>
           </dl>
         </article>
         <article class="record">
-          <header><h3>Sequencing Copilot for Gen Z</h3><span class="label">Microsoft · 2022–23</span></header>
+          <header><span class="label">Microsoft · 2022–2023</span><h3>Sequencing Copilot for Gen Z</h3></header>
           <dl>
             <dt>Question</dt><dd>Which AI features should reach younger users first?</dd>
-            <dt>Method</dt><dd>Designed the Gen Z AI Feature Prioritization study, part of three studies reaching 100,000+ participants.</dd>
-            <dt>Result</dt><dd class="result">Findings turned directly into a shipping order for the Copilot rollout.</dd>
+            <dt>Method</dt><dd>Designed the Gen Z AI Feature Prioritization study, one of three studies reaching 100,000+ participants.</dd>
+            <dt>Outcome</dt><dd class="out">The findings became the shipping order for the Copilot rollout.</dd>
           </dl>
         </article>
         <article class="record">
-          <header><h3>A launch council from nothing</h3><span class="label">Microsoft · 2025</span></header>
+          <header><span class="label">Microsoft · 2025</span><h3>A launch council from scratch</h3></header>
           <dl>
             <dt>Problem</dt><dd>Engineering, marketing and business planning were launching without shared criteria.</dd>
             <dt>Decision</dt><dd>Stood up the Security Launch Council as a repeatable governance framework.</dd>
-            <dt>Result</dt><dd class="result">Shared launch criteria and a monthly prioritization cadence across all three functions.</dd>
+            <dt>Outcome</dt><dd class="out">Shared launch criteria and a monthly prioritization cadence across all three.</dd>
           </dl>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="row" id="principles">
+    <span class="label">Principles</span>
+    <div>
+      <h2>What I hold to</h2>
+      <div class="principles">
+        <div class="principle"><h3>The human is always the final sender.</h3><p>AI drafts, sorts and retrieves. A person reads it and decides. Every system I've built works this way.</p></div>
+        <div class="principle"><h3>Write the criteria before you rank anything.</h3><p>A priority list without criteria is just the loudest request winning. At Amazon, the triage agent ranks requests against criteria I wrote.</p></div>
+        <div class="principle"><h3>Put the ask up top.</h3><p>Busy people read the first line. The decision you need goes there, and the context follows for anyone who wants it.</p></div>
+        <div class="principle"><h3>Don't fill in what you don't know.</h3><p>In a briefing, a guess dressed up as a fact does more damage than a gap. I flag the gap and go find the answer.</p></div>
       </div>
     </div>
   </section>
@@ -270,17 +344,18 @@ mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 
   <section class="row" id="experience">
     <span class="label">Experience</span>
     <div>
-      <h2>Five years, two CEO offices, one rotation program</h2>
+      <h2>Health policy, product, then two CEO offices</h2>
+      <p class="intro">I started out in oral health policy nonprofits and studied public policy at the University of Chicago. I came to tech through Microsoft's rotation program and have been building ever since.</p>
       <ul class="xp">
         <li>
-          <span class="when">Jun 2026 – now</span>
+          <span class="when">June 2026 – now</span>
           <div><h3>Amazon <span>· Communications Specialist, CEO Communications</span></h3>
-          <p>Own the CEO's external engagement portfolio end to end. Built the seven-agent system and serve as the team's AI champion.</p></div>
+          <p>Own the CEO's external engagement portfolio. Built the seven-agent system, ran the media monitoring evaluation, and serve as the team's AI champion.</p></div>
         </li>
         <li>
           <span class="when">2025 – 2026</span>
           <div><h3>Microsoft <span>· Business &amp; Communications Manager, Security Marketing</span></h3>
-          <p>Executive staff to the CVP. Built an engagement tracker that merged three manual workflows and cut update time 80%, stood up the launch council, and ran AI enablement for 12,000+ people.</p></div>
+          <p>Executive staff to the CVP. Built the engagement tracker, stood up the launch council, and led AI enablement through a channel reaching 12,000+ people.</p></div>
         </li>
         <li>
           <span class="when">2023 – 2025</span>
@@ -290,7 +365,7 @@ mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 
         <li>
           <span class="when">2021 – 2023</span>
           <div><h3>Microsoft ACE <span>· Product Marketing Research; Product Marketing, Azure</span><span class="tag">Rotation</span></h3>
-          <p>Two one-year rotations in a selective two-year program. Gen Z research at 100,000+ participant scale, and the Azure SaaS Guide launch.</p></div>
+          <p>Two one-year rotations in a selective two-year program. Gen Z research with 100,000+ participants, and the Azure SaaS Guide launch.</p></div>
         </li>
         <li>
           <span class="when">2017 – 2021</span>
@@ -301,38 +376,41 @@ mark{background:linear-gradient(transparent 12%,var(--marker) 12%,var(--marker) 
     </div>
   </section>
 
-  <section class="row" id="beyond">
+  <section class="row" id="outside">
     <span class="label">Outside work</span>
     <div>
-      <h2>Where else I build</h2>
-      <div class="beyond">
-        <div><h3>Muslims for Progressive Values</h3><p>Board member leading grant strategy and fundraising, including the cultural center capital campaign. Worked on product strategy and the launch plan for the Qur'an Passage of the Day app.</p></div>
-        <div><h3>Seattle Renters' Commission</h3><p>Commissioner advising City Council on renter protections. Helped appoint most of the Social Housing board.</p></div>
-        <div><h3>Improv and stand-up</h3><p>I perform both. Listening fully and adjusting when the scene changes turn out to be product skills too.</p></div>
+      <h2>The rest of me</h2>
+      <div class="outside">
+        <div><h3>Community</h3><p>I'm on the board of Muslims for Progressive Values, where I lead grant strategy and fundraising and worked on the launch of the Qur'an Passage of the Day app. I also served on the Seattle Renters' Commission.</p></div>
+        <div><h3>Improv and stand-up</h3><p>Three levels of improv training at Bandit Theater, plus stand-up. Listening all the way through and adjusting when the scene changes are product skills too.</p></div>
+        <div><h3>Off the clock</h3><p>I cook seriously, hike Mount Rainier in wildflower season, and just started learning to sew. Chicago native, New York next.</p></div>
       </div>
+      <p class="listening">On repeat <b>Abida Parveen</b> · <b>Nusrat Fateh Ali Khan</b> · <b>Coke Studio Pakistan</b></p>
     </div>
   </section>
+</main>
 
-  <footer class="contact" id="contact">
+<footer class="contact" id="contact">
+  <div class="wrap">
     <span class="label">Contact</span>
-    <h2 style="margin-top:14px">Hand me a problem without criteria.</h2>
+    <h2>Hand me a problem with no criteria yet.</h2>
+    <p>I'm happy to talk about product roles, AI systems or anything on this page.</p>
     <div class="links">
       <a class="primary" href="Atif_Osmani_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
       <a href="https://linkedin.com/in/azosmani" target="_blank" rel="noopener">LinkedIn</a>
       <span class="email" id="email">atifzosmani@gmail.com</span>
       <button class="copy" id="copy" type="button">Copy email</button>
     </div>
-  </footer>
-
-  <div class="foot"><span>© 2026 Atif Osmani</span><span>Seattle, WA · relocating to New York</span></div>
-</div>
+    <div class="foot"><span>© 2026 Atif Osmani</span><span>Seattle, WA · moving to New York</span></div>
+  </div>
+</footer>
 
 <script>
 document.getElementById('copy').addEventListener('click', function(){
-  var btn=this, text=document.getElementById('email').textContent;
+  var btn=this, el=document.getElementById('email');
   function done(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy email'},1800)}
-  function fallback(){var r=document.createRange();r.selectNodeContents(document.getElementById('email'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected, press Ctrl+C'}
-  try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+  function fallback(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected. Press Ctrl+C'}
+  try{navigator.clipboard.writeText(el.textContent).then(done,fallback)}catch(e){fallback()}
 });
 </script>
 
