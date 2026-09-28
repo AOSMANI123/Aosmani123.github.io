@@ -1,8 +1,8 @@
 # Prompts
 
-Generic versions of the three AI Builder prompts. Replace the bracketed parts with your office's details.
+The instructions to give the AI. Copy each one into AI Builder (or your AI tool), then replace the parts in [brackets] with your own details, like your leader's name and your team's name.
 
-## 1. Extraction (Flow 1)
+## 1. Reading a request (Step 4)
 
 ```
 Read the email thread below. It is a request for [Executive Title] to take part in an event.
@@ -22,7 +22,7 @@ Email thread:
 [Body]
 ```
 
-## 2. Digest summary line (Flow 2)
+## 2. Monday summary line (Step 3, optional)
 
 ```
 Write one line (under 25 words) for a weekly digest, from these fields:
@@ -30,7 +30,7 @@ Write one line (under 25 words) for a weekly digest, from these fields:
 Lead with the ask. No adjectives about the event's importance.
 ```
 
-## 3. Decline draft (Flow 3)
+## 3. Drafting a decline (Step 5)
 
 ```
 Draft a short, warm reply declining this request on behalf of [Executive Name]'s office.

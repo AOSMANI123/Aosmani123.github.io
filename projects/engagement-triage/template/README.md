@@ -1,45 +1,82 @@
-# Engagement triage template
+# Engagement Tracker Template
 
-A reusable version of the engagement tracker I built at Microsoft for a Corporate Vice President's office. It runs on tools most Microsoft 365 teams already have: Power Automate, AI Builder, SharePoint Lists and Outlook. Nothing here is specific to Microsoft's internal data. The list schema and prompts are rewritten as generic starting points.
+A free, step-by-step template for tracking requests for a leader's time: speaking invitations, meetings, interviews, panels, school visits, video messages. It's written for someone who has never built an automation before.
 
-The rule the whole design follows: **the human is always the final sender.** AI reads, extracts, summarizes and drafts. A person decides and sends.
+I built the original for a senior executive's office at Microsoft, where it cut the time to update each request by 80%. This version is generic. It contains no company data. The full story is in the [case study](https://aosmani123.github.io/projects/engagement-triage/).
 
-## The pipeline
+## What it does
 
-```
-Shared mailbox ──> Flow 1: Intake ──> SharePoint List ──> Flow 2: Monday digest ──> Decision
-                   (AI Builder                              (open requests +          │
-                    extraction)                              decline queue)            │
-                                                                                      ▼
-                                          Flow 4: Brief ◄── Accepted     Declined ──> Flow 3: Draft decline
-                                          (list fields → Word template)               (to Drafts folder; a
-                                                                                       person edits and sends)
-```
+1. Requests arrive by email.
+2. AI reads each one and fills a row in a shared list: event, date, who's asking, their organization, a short summary.
+3. Every Monday, your team gets one email with everything that needs a decision.
+4. When the answer is no, a polite decline is drafted for a person to review and send.
+5. When the answer is yes, the details are poured into your briefing template.
 
-| Flow | Trigger | What it does |
+**The one rule:** the human is always the final sender. AI reads, sorts and drafts. A person decides and sends. Nothing goes out automatically.
+
+## Who it's for
+
+Any team that manages requests on someone else's behalf: executive and chief of staff offices, university presidents' and deans' offices, nonprofit leadership, civic offices, speakers bureaus. If you get more than a handful of requests a week and more than one person touches them, it's worth it.
+
+## What you need
+
+| Tool | What it is | Do you have it? |
 |---|---|---|
-| 1. Intake | New email in the shared mailbox | Runs the extraction prompt, writes one list item per request with the AI summary and a suggested next step |
-| 2. Monday digest | Weekly, Monday morning | Email 1: open requests that need a decision, each with its summary. Email 2: the decline queue, so low-fit asks clear in one review |
-| 3. Draft decline | Status set to Decline | Runs the decline prompt and saves a draft reply in the Drafts folder. Staff edit if needed and send from their own mailbox |
-| 4. Brief | Status set to Accepted | Maps list fields into a Word brief template (Microsoft Syntex in my version) and drafts a speaker-context section for review |
+| Outlook | Email, with a shared inbox for requests | Most Microsoft 365 workplaces |
+| SharePoint Lists | A shared, spreadsheet-like list | Most Microsoft 365 workplaces |
+| Power Automate | "When this happens, do that" automation, no coding | Most Microsoft 365 workplaces |
+| AI Builder | Lets Power Automate send text to an AI model | May need an add-on or credits. Ask your IT admin |
+| Word | For your briefing template | Most Microsoft 365 workplaces |
 
-## Views
+**Not on Microsoft 365?** The same design works with Google Sheets or Airtable for the list, Zapier or Make for the automations, and any AI step those tools offer.
 
-One list, several filtered views for different readers: **Triage** (open requests), **Schedule**, **Chief of Staff view**, **Production tracker** and **All items**. Each reader gets the slice they need without a separate report.
+**No AI access yet?** Build steps 1 to 3 below anyway. A shared list and a Monday email fix most of the problem on their own. Add AI later.
 
-## Files
+## Files in this folder
 
-- `list-schema.csv`: columns for the SharePoint List
-- `prompts.md`: the extraction, summary and decline prompts
+| File | What's in it |
+|---|---|
+| `list-schema.csv` | The columns to create in your list, what each one is for, and whether AI or a person fills it in |
+| `prompts.md` | The instructions to give the AI: one for reading requests, one for the Monday summary lines, one for decline drafts |
 
-## Setup order
+## Build it in this order
 
-1. Create the list from `list-schema.csv`. Add the Status choices first; the flows key off them.
-2. Build Flow 1 and run it on ten old requests before connecting the live mailbox. Check every extracted field by hand.
-3. Add the views, then Flow 2. Send the digest to yourself for two weeks before adding anyone else.
-4. Add Flows 3 and 4 last. They're the ones that produce text other people will read.
+Each step works on its own, so you get value before the whole thing is done.
 
-## If you build this
+**Step 1. Create the list (30 minutes).** Make a new SharePoint List and add the columns in `list-schema.csv`. Set up the Status choices first (New, Needs decision, Accepted, Decline, Scheduled, Closed), because the automations key off them. For now, add a few requests by hand.
 
-- The digest needs only a list and a filter, so it can ship before any AI step does.
-- Log every AI-extracted field next to the human-corrected value from day one. That log becomes your eval set (see [briefing evals](../../briefing-evals/)).
+**Step 2. Add views (15 minutes).** Views are saved filters, so each person sees only what they need:
+
+| View | For | Filter |
+|---|---|---|
+| Triage | Whoever makes the first call | Status is New or Needs decision |
+| Schedule | Scheduler or assistant | Status is Accepted or Scheduled, sorted by date |
+| Leadership | Chief of staff or team lead | Status is Needs decision |
+| Production | Whoever writes briefings | Status is Accepted |
+| All requests | Anyone | Everything, including declines and why |
+
+**Step 3. Send the Monday email (1 hour).** In Power Automate, create a scheduled flow that runs Monday morning, gets every item where Status is New or Needs decision, and emails the team a table. Send it only to yourself for two weeks before adding anyone else.
+
+**Step 4. Let AI read new requests (2 to 3 hours).** Create a flow that runs when a new email arrives in the shared inbox. It sends the email text to AI Builder with the "Reading a request" instructions in `prompts.md`, then creates a list row from what comes back. Before connecting it to the live inbox, run it on ten old requests and check every field by hand.
+
+**Step 5. Draft declines (1 hour).** Create a flow that runs when Status changes to Decline. It sends the details to AI Builder with the "Drafting a decline" instructions and saves the result as a draft in the shared inbox. It never sends. A person does.
+
+**Step 6. Fill in briefings (optional).** For accepted requests, map list fields into a Word briefing template so prep starts mostly filled in.
+
+## Tips
+
+- Write your acceptance criteria down, even if it's five bullets. The tracker makes decisions faster, but it can't tell you what "yes" should mean.
+- Keep the Industry choices to eight or ten. Short lists make AI sorting more reliable.
+- Save why each request was accepted or declined in Decision Notes. Over a year, that becomes your record of what you say yes to.
+- Log the AI's answer next to any correction a person makes. That log shows you where the AI goes wrong, and becomes a test set like my [briefing evals](../../briefing-evals/).
+
+## Words you'll see
+
+| Term | Meaning |
+|---|---|
+| Engagement | Any request for a leader's time |
+| Flow | One automation in Power Automate ("when X happens, do Y") |
+| Trigger | The event that starts a flow, such as a new email arriving |
+| Prompt | The written instructions you give the AI |
+| View | A saved filter on the list |
+| Triage | Sorting new requests so the right ones get a decision first |
