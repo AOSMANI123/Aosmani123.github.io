@@ -343,25 +343,43 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
     <span class="label">Projects</span>
     <div>
       <h2>Work you can open</h2>
-      <p class="intro">One shipped case study, one product spec and one piece of working code. Anything not yet tested with users or run against a real model is labeled that way.</p>
-      <div class="projects">
+      <p class="intro">Two shipped case studies, one product spec and one piece of working code. Anything not yet tested with users or run against a real model is labeled that way.</p>
+      <div class="projects" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <a class="project" href="projects/oceo-automation/">
+          <span class="kind">Case study · Shipped at Microsoft</span>
+          <h3>AI-powered engagement automation</h3>
+          <p>Rebuilt a CVP's engagement workflow from three manual processes into one AI-assisted pipeline with Power Automate, AI Builder and SharePoint. ~80% less processing time.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Power Automate · AI Builder · SharePoint</span>
+            Read the case study →
+          </span>
+        </a>
         <a class="project" href="projects/engagement-triage/">
           <span class="kind">Case study + free template · Shipped</span>
-          <h3>An engagement tracker any office can run</h3>
-          <p>For any team that fields requests for a leader's time. How I built it, what it cut, and a step-by-step template anyone can set up.</p>
-          <span class="go">See the tracker →</span>
+          <h3>Engagement tracker template</h3>
+          <p>A generalized version of the system above that any office can set up. How I built it, what it cut, and a step-by-step template.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Microsoft 365 · Power Automate · AI Builder</span>
+            See the tracker →
+          </span>
         </a>
         <a class="project" href="projects/whatsapp-signups/">
           <span class="kind">Teardown + spec</span>
           <h3>Sign-up lists for WhatsApp Communities</h3>
           <p>WhatsApp can tell an organizer who's coming, not who's doing what. A teardown, three options, a spec and a metrics plan.</p>
-          <span class="go">Read the spec →</span>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Method: Product teardown · Spec · Metrics plan</span>
+            Read the spec →
+          </span>
         </a>
         <a class="project" href="projects/briefing-evals/">
           <span class="kind">Open-source eval · Code</span>
           <h3>Briefing evals</h3>
           <p>Twelve fictional requests, each with a trap, that test whether an AI briefing drafter invents facts or flags what's missing.</p>
-          <span class="go">See the evals →</span>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Python · No dependencies</span>
+            See the evals →
+          </span>
         </a>
       </div>
     </div>

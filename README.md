@@ -10,7 +10,8 @@ This repo is my personal site and the projects on it.
 
 | Project | What it is | Type |
 |---|---|---|
-| [Engagement tracker](https://aosmani123.github.io/projects/engagement-triage/) | An AI-assisted tracker for any office that fields requests for a leader's time. Case study plus a free, step-by-step [template](projects/engagement-triage/template). Cut update time per request by 80%. | Shipped |
+| [AI-powered engagement automation](https://aosmani123.github.io/projects/oceo-automation/) | Rebuilt a CVP's engagement workflow from three manual processes into one AI-assisted pipeline with Power Automate, AI Builder and SharePoint. ~80% less processing time. | Shipped |
+| [Engagement tracker template](https://aosmani123.github.io/projects/engagement-triage/) | A generalized version of the above that any office can set up. Case study plus a free, step-by-step [template](projects/engagement-triage/template). | Shipped |
 | [Sign-up lists for WhatsApp Communities](https://aosmani123.github.io/projects/whatsapp-signups/) | A product teardown of how Communities handles events, three options, a spec and a metrics plan for event sign-up lists. | Spec, not yet validated |
 | [Briefing evals](https://aosmani123.github.io/projects/briefing-evals/) | Twelve fictional requests that test whether an AI briefing drafter invents facts or flags what's missing. Python, no dependencies, [code here](projects/briefing-evals). | Working code |
 
@@ -31,7 +32,8 @@ One rule runs through every AI system I build: **the human is always the final s
 index.html                     personal site
 assets/project.css             shared styles for project pages
 projects/
-  engagement-triage/           case study + template (list schema, prompts, setup guide)
+  oceo-automation/             AI engagement automation case study (Microsoft)
+  engagement-triage/           engagement tracker template + setup guide
   whatsapp-signups/            teardown + spec
   briefing-evals/              eval harness, 12 cases, tests
 ```

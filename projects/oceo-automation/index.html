@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Engagement Automation</title>
+<meta name="description" content="How I rebuilt a CVP's engagement workflow with Power Automate, AI Builder and SharePoint — cutting manual processing by 80%. Case study by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Case study · Shipped at Microsoft</span>
+      <h1>AI-powered engagement automation for a CVP's office</h1>
+      <p>I rebuilt the engagement workflow for Microsoft's Security Marketing CVP from three disconnected manual processes into one AI-assisted pipeline. The same architectural pattern later scaled to a seven-agent system at Amazon.</p>
+      <div class="meta"><span>Built <b>2025</b></span><span>Role <b>Business Manager, CVP executive staff</b></span><span>Stack <b>Power Automate · AI Builder · SharePoint</b></span><span>Impact <b>~80% less processing time</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> The Security Marketing CVP's office received a steady flow of engagement requests — speaking invitations, customer meetings, partner events, media inquiries. Managing them took three separate manual workflows. I designed and deployed an AI-assisted pipeline that reads each request, extracts the key details, and stages everything for human review. Nothing goes out without a person reading it first.</p></div>
+
+  <h2>The problem</h2>
+  <p>When I joined the Security Marketing CVP's executive staff as Business Manager, engagement management ran on three disconnected workflows:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Before</th><th>What it meant</th></tr></thead>
+    <tbody>
+      <tr><td>Requests tracked across email, spreadsheets and a shared doc</td><td>No single source of truth. The same request updated in multiple places, or not at all</td></tr>
+      <tr><td>Every email opened and read manually to extract details</td><td>High time cost per request, prone to missed details</td></tr>
+      <tr><td>No weekly digest or decision cadence</td><td>Requests sat until someone asked about them</td></tr>
+      <tr><td>Decline replies written from scratch each time</td><td>Inconsistent tone, more time per decision</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What I built</h2>
+  <p>A single pipeline that consolidates intake, triage and response into one system, with AI handling the reading and drafting — and a human always making the call.</p>
+
+  <h3>Workflow 1: Intake and extraction</h3>
+  <p>When a new engagement request arrives in the shared inbox, a Power Automate flow triggers AI Builder (GPT-4o mini) to read the email and extract structured fields: event name, date, requesting organization, requestor, format, audience size and a two-sentence summary. These land as a new row in a SharePoint List — one row per request, every request in one place.</p>
+
+  <h3>Workflow 2: Weekly digest and triage</h3>
+  <p>Every Monday, a second flow compiles all open requests into a single digest email for the team. Each entry carries its AI-generated summary, so nobody has to open individual threads to know what's waiting. The team triages from the digest and updates statuses directly in the list.</p>
+
+  <h3>Workflow 3: Response drafting</h3>
+  <p>When a request is marked "Decline," a third flow drafts a polite, personalized reply using the extracted details and saves it to the team's Drafts folder. A staff member reviews, edits if needed, and sends. For accepted engagements, the same details pour into a briefing template, so the prep document starts mostly filled in.</p>
+
+  <h2>The one rule</h2>
+  <p>Set before anything was built: <b>the human is always the final sender.</b> AI reads, extracts, summarizes and drafts. A person reviews every extraction, makes every accept/decline decision, and sends every reply. This wasn't a guardrail added later — it was the design constraint from day one.</p>
+
+  <h2>The tech stack</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Tool</th><th>Role in the system</th></tr></thead>
+    <tbody>
+      <tr><td>Power Automate</td><td>Orchestration — triggers on new emails, compiles the weekly digest, routes decline drafts</td></tr>
+      <tr><td>AI Builder (GPT-4o mini)</td><td>Reads each email, extracts structured fields, generates decline drafts and briefing pre-fills</td></tr>
+      <tr><td>SharePoint Lists</td><td>The tracker itself — one row per request with filtered views for triage, scheduling and production</td></tr>
+      <tr><td>Outlook</td><td>Shared inbox for intake, Drafts folder for staged replies</td></tr>
+      <tr><td>Word</td><td>Briefing template, auto-populated from the list</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">The entire stack runs on tools most Microsoft 365 organizations already have. No new procurement, no external APIs, no engineering support needed.</p>
+
+  <h2>Results</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Measure</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Manual processing time per request</td><td class="num"><b>~80% reduction</b></td></tr>
+      <tr><td>Separate workflows consolidated</td><td class="num">3 → 1</td></tr>
+      <tr><td>Decline reply drafting time</td><td class="num"><b>~70% reduction</b></td></tr>
+      <tr><td>Briefing pre-fill coverage</td><td class="num"><b>~40% of fields auto-populated</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What I also owned in this role</h2>
+  <p>The engagement automation was one piece of the Business Manager role on the CVP's executive staff. I also:</p>
+  <ul>
+    <li>Owned the org's all-hands (held every six weeks) including the content and run of show</li>
+    <li>Managed the Security Marketing offsite</li>
+    <li>Stood up the Security Launch Council — a shared governance framework for engineering, marketing and business planning to coordinate launches</li>
+    <li>Led AI enablement across the org through a channel reaching 12,000+ people</li>
+  </ul>
+
+  <h2>What carried forward</h2>
+  <p>This system proved the pattern: AI handles the reading and drafting, a shared list is the single source of truth, and a human always makes the final call. When I moved to Amazon's CEO Communications team, I applied the same architecture at a larger scale — a <a href="../../#builds">seven-agent system</a> managing 200+ CEO engagement items across intake, triage, briefing production and knowledge retrieval.</p>
+  <p>The Microsoft build also led to the <a href="../engagement-triage/">engagement tracker template</a>, a generalized version that any office can set up, and to <a href="../briefing-evals/">briefing evals</a>, a test suite for the failure mode I worry about most: an AI drafter that invents what it wasn't given.</p>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>
