@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seven-Agent System</title>
+<meta name="description" content="How I designed a seven-agent system to manage 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. Case study by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Architecture · Shipped</span>
+      <h1>Seven-agent system for executive engagement operations</h1>
+      <p>I designed and deployed a multi-agent orchestration system that manages 200+ executive engagement items — from intake through triage, briefing production and knowledge retrieval — with a human in the loop at every decision point.</p>
+      <div class="meta"><span>Built <b>2025</b></span><span>Role <b>Business Manager / CEO Communications</b></span><span>Stack <b>Multi-agent orchestration</b></span><span>Impact <b>200+ items managed</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> A CEO's office receives hundreds of engagement requests — speaking invitations, customer meetings, events, media inquiries. I built a system of seven specialized AI agents that handles intake, triage, scheduling, briefing production, coverage evaluation and knowledge retrieval. Each agent has one job. An orchestrator routes work between them. A human reviews every output before anything leaves the system.</p></div>
+
+  <h2>The problem</h2>
+  <p>A CEO's office fields a constant stream of requests for the executive's time. Before this system existed, the workflow looked like this:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Before</th><th>What it meant</th></tr></thead>
+    <tbody>
+      <tr><td>Requests tracked in email threads and spreadsheets</td><td>No single source of truth. Requests updated in multiple places, or not at all</td></tr>
+      <tr><td>Every request read and processed manually</td><td>High time cost per item, details missed under volume</td></tr>
+      <tr><td>Briefing documents assembled from scratch each time</td><td>Hours of research repeated for recurring topics and contacts</td></tr>
+      <tr><td>No systematic way to evaluate briefing completeness</td><td>Coverage gaps discovered only when the executive asked a question nobody had an answer to</td></tr>
+      <tr><td>No structured knowledge base across engagements</td><td>Institutional memory lived in individuals' heads and scattered files</td></tr>
+    </tbody>
+  </table></div>
+  <p>The volume alone — 200+ items — made manual processing unsustainable. But the real problem wasn't volume. It was that every engagement touched multiple steps (intake, scoring, scheduling, briefing, evaluation), and those steps were handled by different people with no shared system connecting them.</p>
+
+  <h2>The architecture</h2>
+  <p>Seven agents, each with a single responsibility, coordinated by an orchestrator. The diagram below shows how work flows through the system.</p>
+
+  <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architecture diagram showing seven agents connected through an orchestrator" style="width:100%;max-width:800px;margin:24px auto;display:block">
+    <style>
+      .agent-box{fill:var(--sheet);stroke:var(--rule);stroke-width:1.5}
+      .orch-box{fill:var(--indigo);stroke:var(--marigold);stroke-width:2}
+      .agent-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;fill:var(--muted)}
+      .agent-name{font-family:var(--display);font-size:14px;fill:var(--ink)}
+      .orch-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;fill:var(--marigold)}
+      .orch-name{font-family:var(--display);font-size:15px;fill:var(--on-indigo)}
+      .flow-line{stroke:var(--rule);stroke-width:1.5;fill:none;marker-end:url(#arrow)}
+      .flow-orch{stroke:var(--marigold);stroke-width:1.5;stroke-dasharray:6,4;fill:none}
+      .human-box{fill:var(--teal-soft);stroke:var(--teal);stroke-width:1.5;rx:20;ry:20}
+      .human-label{font-family:var(--mono);font-size:10px;fill:var(--teal);letter-spacing:.06em}
+    </style>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,3.5 L0,7z" fill="var(--muted)"/>
+      </marker>
+    </defs>
+
+    <!-- Row 1: Intake, Triage, Scheduling -->
+    <rect class="agent-box" x="40" y="30" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="140" y="52" text-anchor="middle">Agent 1</text>
+    <text class="agent-name" x="140" y="76" text-anchor="middle">Intake Agent</text>
+
+    <rect class="agent-box" x="300" y="30" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="400" y="52" text-anchor="middle">Agent 2</text>
+    <text class="agent-name" x="400" y="76" text-anchor="middle">Triage Agent</text>
+
+    <rect class="agent-box" x="560" y="30" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="660" y="52" text-anchor="middle">Agent 3</text>
+    <text class="agent-name" x="660" y="76" text-anchor="middle">Scheduling Agent</text>
+
+    <!-- Flow arrows: row 1 -->
+    <line class="flow-line" x1="240" y1="66" x2="300" y2="66"/>
+    <line class="flow-line" x1="500" y1="66" x2="560" y2="66"/>
+
+    <!-- Orchestrator -->
+    <rect class="orch-box" x="220" y="200" width="360" height="72" rx="4"/>
+    <text class="orch-label" x="400" y="222" text-anchor="middle">Agent 7</text>
+    <text class="orch-name" x="400" y="248" text-anchor="middle">Orchestrator</text>
+
+    <!-- Row 3: Briefing Drafter, Coverage Evaluator, Knowledge Retrieval -->
+    <rect class="agent-box" x="40" y="370" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="140" y="392" text-anchor="middle">Agent 4</text>
+    <text class="agent-name" x="140" y="416" text-anchor="middle">Briefing Drafter</text>
+
+    <rect class="agent-box" x="300" y="370" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="400" y="392" text-anchor="middle">Agent 5</text>
+    <text class="agent-name" x="400" y="416" text-anchor="middle">Coverage Evaluator</text>
+
+    <rect class="agent-box" x="560" y="370" width="200" height="72" rx="4"/>
+    <text class="agent-label" x="660" y="392" text-anchor="middle">Agent 6</text>
+    <text class="agent-name" x="660" y="416" text-anchor="middle">Knowledge Retrieval</text>
+
+    <!-- Dashed lines from orchestrator to all agents -->
+    <line class="flow-orch" x1="320" y1="200" x2="140" y2="102"/>
+    <line class="flow-orch" x1="400" y1="200" x2="400" y2="102"/>
+    <line class="flow-orch" x1="480" y1="200" x2="660" y2="102"/>
+    <line class="flow-orch" x1="320" y1="272" x2="140" y2="370"/>
+    <line class="flow-orch" x1="400" y1="272" x2="400" y2="370"/>
+    <line class="flow-orch" x1="480" y1="272" x2="660" y2="370"/>
+
+    <!-- Flow arrows: row 3 -->
+    <line class="flow-line" x1="240" y1="406" x2="300" y2="406"/>
+    <line class="flow-line" x1="560" y1="406" x2="500" y2="406"/>
+
+    <!-- Human review -->
+    <rect class="human-box" x="290" y="480" width="220" height="32"/>
+    <text class="human-label" x="400" y="501" text-anchor="middle">Human reviews every output</text>
+    <line class="flow-line" x1="400" y1="442" x2="400" y2="480" style="stroke:var(--teal)"/>
+  </svg>
+
+  <p class="note">Solid arrows show the primary data flow. Dashed lines show orchestrator coordination — routing tasks, handling retries, managing failures. The human review step sits at the end of every path.</p>
+
+  <h2>What each agent does</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Agent</th><th>Input</th><th>Output</th><th>Key design decision</th></tr></thead>
+    <tbody>
+      <tr><td><b>Intake Agent</b></td><td>Raw engagement request (email, form, forwarded message)</td><td>Structured record: event name, date, org, requestor, format, audience, summary</td><td>Extract, don't interpret. The agent pulls fields but makes no judgment about priority</td></tr>
+      <tr><td><b>Triage Agent</b></td><td>Structured record from Intake</td><td>Priority score, category tag, recommended action</td><td>Scoring rubric is explicit and auditable — no black-box ranking</td></tr>
+      <tr><td><b>Scheduling Agent</b></td><td>Triaged request + calendar state</td><td>Conflict check, logistics summary, proposed slot</td><td>Read-only access to calendar. Proposes but never books</td></tr>
+      <tr><td><b>Briefing Drafter</b></td><td>Accepted engagement + knowledge base</td><td>Draft briefing document with sourced sections</td><td>Every claim cites a source from the knowledge base. Unsourced sections flagged</td></tr>
+      <tr><td><b>Coverage Evaluator</b></td><td>Draft briefing + engagement context</td><td>Coverage score, gap list, suggested additions</td><td>Measures what the brief missed, not just what it got right</td></tr>
+      <tr><td><b>Knowledge Retrieval</b></td><td>Query from any agent</td><td>Relevant documents, prior engagement records, context</td><td>Maintains the reference corpus. Serves every other agent that needs background</td></tr>
+      <tr><td><b>Orchestrator</b></td><td>Events, completion signals, errors</td><td>Task routing, retry logic, status tracking</td><td>Stateless between runs. Picks up from the last known state, doesn't assume prior context</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The one rule</h2>
+  <p>Set before anything was built: <b>the human is always the final sender.</b> AI reads, extracts, triages, drafts and evaluates. A person reviews every extraction, makes every accept/decline decision, edits every briefing, and sends every communication. This wasn't a guardrail added later — it was the design constraint from day one. The same rule governed the <a href="../oceo-automation/">earlier system I built at Microsoft</a>.</p>
+
+  <h2>Results</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Measure</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Engagement items managed</td><td class="num"><b>200+</b></td></tr>
+      <tr><td>Briefing assembly time</td><td class="num"><b>~60% reduction</b></td></tr>
+      <tr><td>Coverage evaluation metric</td><td class="num"><b>Established for the first time</b></td></tr>
+      <tr><td>Auto-sent communications</td><td class="num"><b>Zero</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>The last line is the one I care about most. A system that handles 200+ items and sends nothing on its own is doing its job: it makes humans faster without taking their judgment away.</p>
+
+  <h2>What carried forward from Microsoft</h2>
+  <p>This system is the direct successor of the <a href="../oceo-automation/">AI-powered engagement automation</a> I built for a CVP's office at Microsoft. That earlier system proved the core pattern: AI handles reading, extraction and drafting; a shared list is the single source of truth; a human makes every final call.</p>
+  <p>What changed at scale:</p>
+  <ul>
+    <li><b>One pipeline became seven agents.</b> The Microsoft system was three sequential workflows. At 200+ items, I decomposed it into specialized agents that could run in parallel</li>
+    <li><b>Briefing production got its own evaluation loop.</b> The Coverage Evaluator didn't exist in the Microsoft system — it was built because the failure mode I worried about most (a drafter that invents what it wasn't given) needed a systematic check</li>
+    <li><b>Knowledge retrieval became a shared service.</b> Instead of each step pulling its own context, one agent maintains the reference corpus and serves every other agent that needs background</li>
+    <li><b>The orchestrator replaced manual sequencing.</b> Routing, retries and failure handling moved from people monitoring queues to an agent that tracks state</li>
+  </ul>
+
+  <h2>What I chose not to build, and why</h2>
+  <ul>
+    <li><b>Didn't build a fully autonomous system.</b> Kept humans in the loop at every decision point. An executive's calendar and communications are too consequential for unsupervised AI. The agents make the team faster, not independent of them</li>
+    <li><b>Didn't build a custom LLM.</b> Used the platform's existing language models. The differentiation is in the agent architecture and the workflows, not the underlying model. Custom fine-tuning would have added months with marginal returns</li>
+    <li><b>Didn't build a UI.</b> The agents run behind the existing tools the team already uses. No new interface to learn, no adoption friction. The best tool is one that improves the workflow people already have</li>
+  </ul>
+
+  <h2>What I'd build next</h2>
+  <ul>
+    <li><b>Cross-engagement pattern detection.</b> An agent that spots recurring themes, repeat requestors and seasonal patterns across the full engagement history — shifting from reactive processing to proactive intelligence</li>
+    <li><b>Briefing quality feedback loop.</b> Capture which parts of a briefing the executive actually used, and feed that back into the Briefing Drafter's priorities. The coverage metric today measures completeness; the next version should measure relevance</li>
+    <li><b>Agent portability.</b> Package the agent definitions so the system can run on different orchestration platforms without rewriting the logic. The architecture shouldn't be locked to one vendor's tooling</li>
+  </ul>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani &middot; independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Product Teardowns</title>
+<meta name="description" content="Five teardowns of shipped AI products through a PM lens: metrics trees, funnel analysis, and specific feature recommendations. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">&#8592; Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Product thinking &middot; Analysis</span>
+      <h1>AI product teardowns</h1>
+      <p>Five shipped AI products examined through a PM lens. Each teardown maps the metrics tree, hypothesizes where users drop in the funnel, names one feature to kill and one to build, and states what data would reverse the call.</p>
+      <div class="meta"><span>Type <b>Analysis</b></span><span>Built <b>October 2026</b></span><span>Format <b>Markdown teardowns</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>The premise.</b> Most AI product analysis stops at "it uses a large language model." These teardowns go deeper: what is the product actually optimizing for, where does the funnel break, and what would you change if you owned it? Each one takes a specific, defensible position and names the data that would prove it wrong.</p></div>
+
+  <h2>The teardowns</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Product</th><th>Core thesis</th><th>Teardown</th></tr></thead>
+    <tbody>
+      <tr><td>ChatGPT</td><td>Retention problem disguised as a growth story; the empty prompt box is the biggest conversion killer</td><td><a href="teardown-chatgpt.md">Read</a></td></tr>
+      <tr><td>GitHub Copilot</td><td>Acceptance rate is a vanity metric; the real measure is whether developers stay in flow longer</td><td><a href="teardown-copilot.md">Read</a></td></tr>
+      <tr><td>Notion AI</td><td>Bundling AI into a workspace tool backfires when usage cannibalizes the core editing loop</td><td><a href="teardown-notion-ai.md">Read</a></td></tr>
+      <tr><td>Midjourney</td><td>Discord-native distribution is a moat until it becomes a ceiling; the web app transition is existential</td><td><a href="teardown-midjourney.md">Read</a></td></tr>
+      <tr><td>Grammarly</td><td>AI rewrite features risk destroying the trust model that made the red-underline product work</td><td><a href="teardown-grammarly.md">Read</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The framework</h2>
+  <p>Every teardown follows the same five-part structure. The goal is to force specificity: no hand-waving about "leveraging AI," no generic praise, no analysis that could apply to any product.</p>
+
+  <h3>1. Metrics tree</h3>
+  <p>Primary metric, the driver metrics that compose it, and the input metrics a team can actually move. The tree should make the product's strategy legible. If you can't draw the tree, you don't understand the business.</p>
+
+  <h3>2. Hypothesized funnel</h3>
+  <p>Awareness through retention, with estimated drop-off at each stage and a specific explanation for why. These are hypotheses, not benchmarks, and they're stated precisely enough to be tested.</p>
+
+  <h3>3. The one feature I would kill</h3>
+  <p>Not "deprioritize." Kill. The feature that is actively hurting the product, the mechanism by which it hurts, and the data that would make me keep it instead.</p>
+
+  <h3>4. The one feature I would build</h3>
+  <p>The user problem, the proposed solution, the metric it targets, and the assumptions that would need to hold for it to work.</p>
+
+  <h3>5. What data would change my mind</h3>
+  <p>Two to three specific, measurable data points that would reverse the recommendations above. This section is the intellectual honesty check. Positions stated without falsifiability conditions aren't analysis.</p>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani &middot; independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

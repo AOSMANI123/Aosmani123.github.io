@@ -1,0 +1,61 @@
+{
+  "roster": [
+    {
+      "name": "Tim Cook",
+      "aliases": ["Timothy Cook"],
+      "company": "Apple"
+    },
+    {
+      "name": "Satya Nadella",
+      "aliases": [],
+      "company": "Microsoft"
+    },
+    {
+      "name": "Sundar Pichai",
+      "aliases": ["Pichai Sundararajan"],
+      "company": "Alphabet"
+    },
+    {
+      "name": "Andy Jassy",
+      "aliases": [],
+      "company": "Amazon"
+    },
+    {
+      "name": "Jensen Huang",
+      "aliases": [],
+      "company": "NVIDIA"
+    },
+    {
+      "name": "Jamie Dimon",
+      "aliases": [],
+      "company": "JPMorgan Chase"
+    },
+    {
+      "name": "Mary Barra",
+      "aliases": [],
+      "company": "General Motors"
+    },
+    {
+      "name": "David Solomon",
+      "aliases": [],
+      "company": "Goldman Sachs"
+    },
+    {
+      "name": "Lisa Su",
+      "aliases": [],
+      "company": "AMD"
+    },
+    {
+      "name": "Arvind Krishna",
+      "aliases": [],
+      "company": "IBM"
+    }
+  ],
+  "sources": [
+    {"name": "Reuters", "rss_url": "https://feeds.reuters.com/reuters/businessNews"},
+    {"name": "AP News", "rss_url": "https://rsshub.app/apnews/topics/business"},
+    {"name": "CNBC", "rss_url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10001147"},
+    {"name": "Bloomberg (via Google News)", "rss_url": "https://news.google.com/rss/search?q=site:bloomberg.com+when:1d&hl=en-US&gl=US&ceid=US:en"},
+    {"name": "Wall Street Journal (via Google News)", "rss_url": "https://news.google.com/rss/search?q=site:wsj.com+when:1d&hl=en-US&gl=US&ceid=US:en"}
+  ]
+}

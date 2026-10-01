@@ -343,21 +343,66 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
     <span class="label">Projects</span>
     <div>
       <h2>Work you can open</h2>
-      <p class="intro">Two shipped case studies, one product spec and one piece of working code. Anything not yet tested with users or run against a real model is labeled that way.</p>
+      <p class="intro">Shipped systems, working tools and product analysis. Each project follows a PM skeleton: problem, metrics, results, and what I chose not to build. Anything not yet tested with users is labeled that way.</p>
       <div class="projects" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <a class="project" href="projects/agent-system/">
+          <span class="kind">Architecture · Shipped</span>
+          <h3>Seven-agent system for executive engagements</h3>
+          <p>Designed a multi-agent orchestration system managing 200+ CEO engagement items across intake, triage, briefing production and knowledge retrieval.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Multi-agent orchestration · Architecture diagram</span>
+            See the architecture →
+          </span>
+        </a>
         <a class="project" href="projects/oceo-automation/">
           <span class="kind">Case study · Shipped at Microsoft</span>
           <h3>AI-powered engagement automation</h3>
-          <p>Rebuilt a CVP's engagement workflow from three manual processes into one AI-assisted pipeline with Power Automate, AI Builder and SharePoint. ~80% less processing time.</p>
+          <p>Rebuilt a CVP's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time.</p>
           <span class="go" style="margin-top:8px">
             <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Power Automate · AI Builder · SharePoint</span>
             Read the case study →
           </span>
         </a>
+        <a class="project" href="projects/writing-critic/">
+          <span class="kind">Developer tool + web demo</span>
+          <h3>Executive writing critic</h3>
+          <p>Seven deterministic checks against an explicit executive writing bar: hedge words, passive voice, data density, adjective bloat, sentence variety, buried lede, opening specificity.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Python stdlib · Vanilla JS · CLI + web scorer</span>
+            Try the scorer →
+          </span>
+        </a>
+        <a class="project" href="projects/coverage-gap/">
+          <span class="kind">Measurement tool · Working code</span>
+          <h3>Coverage gap detector</h3>
+          <p>Evaluates whether a news brief adequately covers what was actually available. Outputs coverage score, entity breakdown, and a missed-consensus report.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Python · RSS · News APIs</span>
+            See the evaluator →
+          </span>
+        </a>
+        <a class="project" href="projects/briefing-evals/">
+          <span class="kind">Eval harness · Code</span>
+          <h3>LLM prompt eval harness</h3>
+          <p>Golden-set regression testing for prompts. Versioned prompts, fixture inputs, nondeterminism-tolerant assertions, and a pass gate that blocks regressions.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Python · No dependencies</span>
+            See the harness →
+          </span>
+        </a>
+        <a class="project" href="projects/ai-teardowns/">
+          <span class="kind">Product thinking · Analysis</span>
+          <h3>AI product teardowns</h3>
+          <p>Five teardowns of shipped AI products. Each one: the metrics tree, a hypothesized funnel, the one feature to kill, the one to build, and what data would change my mind.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Method: Metrics tree · Funnel analysis · Product judgment</span>
+            Read the teardowns →
+          </span>
+        </a>
         <a class="project" href="projects/engagement-triage/">
           <span class="kind">Case study + free template · Shipped</span>
           <h3>Engagement tracker template</h3>
-          <p>A generalized version of the system above that any office can set up. How I built it, what it cut, and a step-by-step template.</p>
+          <p>A generalized version of the automation system that any office can set up. Case study plus a free, step-by-step template.</p>
           <span class="go" style="margin-top:8px">
             <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Microsoft 365 · Power Automate · AI Builder</span>
             See the tracker →
@@ -370,15 +415,6 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
           <span class="go" style="margin-top:8px">
             <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Method: Product teardown · Spec · Metrics plan</span>
             Read the spec →
-          </span>
-        </a>
-        <a class="project" href="projects/briefing-evals/">
-          <span class="kind">Open-source eval · Code</span>
-          <h3>Briefing evals</h3>
-          <p>Twelve fictional requests, each with a trap, that test whether an AI briefing drafter invents facts or flags what's missing.</p>
-          <span class="go" style="margin-top:8px">
-            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Python · No dependencies</span>
-            See the evals →
           </span>
         </a>
       </div>

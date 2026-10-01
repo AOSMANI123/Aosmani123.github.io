@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Writing Critic</title>
+<meta name="description" content="A deterministic writing scorer that checks executive documents for hedge words, passive voice, data density, and six other rules. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+<style>
+/* Tool-specific styles */
+.scorer{background:var(--sheet);border:1px solid var(--rule);padding:24px;margin:24px 0}
+.scorer textarea{width:100%;min-height:180px;padding:14px 16px;font-family:var(--body);font-size:.95rem;line-height:1.6;border:1px solid var(--rule);background:var(--paper);color:var(--ink);resize:vertical}
+.scorer textarea:focus{outline:2px solid var(--marigold);outline-offset:1px;border-color:transparent}
+.scorer textarea::placeholder{color:var(--muted)}
+.scorer-actions{display:flex;align-items:center;gap:14px;margin-top:14px}
+.btn{font-family:var(--mono);font-size:.82rem;letter-spacing:.08em;padding:10px 24px;border:none;cursor:pointer;text-transform:uppercase;transition:background .15s}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:focus-visible{outline:2px solid var(--marigold);outline-offset:3px}
+.btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--rule);padding:9px 20px}
+.btn-secondary:hover{border-color:var(--muted)}
+.char-count{font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-left:auto}
+
+/* Results */
+.results{margin-top:24px;display:none}
+.results.show{display:block}
+.overall{text-align:center;padding:28px 20px;border:1px solid var(--rule);background:var(--paper);margin-bottom:20px}
+.overall-grade{font-family:var(--display);font-size:4rem;line-height:1}
+.overall-gpa{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin-top:6px}
+.overall-stats{font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-top:10px}
+.grade-a{color:var(--teal)}
+.grade-b{color:var(--teal)}
+.grade-c{color:var(--marigold)}
+.grade-d{color:var(--marigold)}
+.grade-f{color:#C44}
+
+.check-card{border:1px solid var(--rule);background:var(--paper);margin-bottom:12px}
+.check-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none}
+.check-header:hover{background:var(--sheet)}
+.check-name{font-family:var(--body);font-weight:600;font-size:.95rem}
+.check-grade{font-family:var(--display);font-size:1.3rem;width:2rem;text-align:center}
+.check-body{padding:0 16px 16px;display:none}
+.check-card.open .check-body{display:block}
+.check-metrics{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.check-metrics span{display:inline-block;margin-right:18px}
+.finding{font-size:.88rem;padding:8px 12px;background:var(--sheet);border-left:3px solid var(--rule);margin-bottom:6px;line-height:1.5}
+.finding .sent-num{font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-right:6px}
+.finding .hedge-tag{font-family:var(--mono);font-size:.72rem;background:var(--mark-bg);padding:1px 5px;margin-left:4px}
+.finding-note{font-size:.88rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">&#8592; Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Developer tool + web demo</span>
+      <h1>Executive Writing Critic</h1>
+      <p>A deterministic writing scorer that checks documents against an explicit executive writing bar: hedge words, passive voice, data density, adjective bloat, sentence variety, and lede placement. Seven rules, zero LLM calls, line-level findings.</p>
+      <div class="meta"><span>Type <b>CLI tool + web scorer</b></span><span>Built <b>October 2026</b></span><span>Stack <b>Python stdlib, vanilla JS</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> Most executive writing advice says "be clear" without telling you what to measure. This tool runs seven deterministic checks on pasted text and returns a letter grade with line-level findings. No LLM, no API key, no ambiguity about why something got flagged. Paste below or run the CLI.</p></div>
+
+  <!-- Scorer -->
+  <h2>Try it</h2>
+  <div class="scorer">
+    <textarea id="input" placeholder="Paste an executive document, memo, strategy brief, or proposal here..."></textarea>
+    <div class="scorer-actions">
+      <button class="btn btn-primary" id="score-btn" onclick="runScore()">Score</button>
+      <button class="btn btn-secondary" id="clear-btn" onclick="clearAll()">Clear</button>
+      <span class="char-count" id="char-count">0 words</span>
+    </div>
+    <div class="results" id="results"></div>
+  </div>
+
+  <!-- Explanatory sections -->
+  <h2>What it checks</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Check</th><th>What it measures</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>Hedge / weasel words</td><td>Count of "might," "possibly," "somewhat," "I think," and ten others</td><td>Hedges signal the writer isn't sure of their own point. Executives stop reading.</td></tr>
+      <tr><td>Passive voice</td><td>Sentences with passive construction as a share of total</td><td>Passive voice hides who is responsible for what. In a decision doc, that's fatal.</td></tr>
+      <tr><td>Data density</td><td>Share of sentences containing a number, stat, or metric</td><td>Claims without data are opinions. Executive docs earn trust with evidence.</td></tr>
+      <tr><td>Adjective bloat</td><td>Adjective count per sentence, flagging those above 3</td><td>Adjective-heavy writing is vague. "A robust, scalable, world-class platform" says nothing.</td></tr>
+      <tr><td>Sentence length variance</td><td>Standard deviation and coefficient of variation of sentence word counts</td><td>Monotonous rhythm puts people to sleep. Good writing varies pace.</td></tr>
+      <tr><td>Buried lede</td><td>Whether the first paragraph contains a recommendation, action verb, or number</td><td>If the ask is on page two, it won't get read.</td></tr>
+      <tr><td>Opening specificity</td><td>Whether paragraph one has a concrete noun, named entity, or number</td><td>Abstract openings lose the reader before you've said anything.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>How the grade works</h2>
+  <p>Each check gets a letter grade (A through F) based on where the measured rate falls against calibrated thresholds. The overall grade is the GPA of the individual checks: all A's = 4.0, a mix of B's and C's lands around 2.5. The tool is tuned for precision over recall: it flags only high-confidence findings to keep the signal-to-noise ratio useful.</p>
+
+  <h2>Design decision: deterministic first</h2>
+  <p>This tool uses pattern matching and heuristics, not an LLM. That's deliberate. Deterministic rules are fast, free, reproducible, and auditable. Every flag traces to a specific regex or threshold you can read in the source. The open question is whether rules alone catch enough real issues. If user testing shows they miss more than 15% of findings, the next version adds an LLM layer for semantic checks (tone, logical structure, argument quality). But rules go first, because you should know what simple measurement buys you before you spend on inference.</p>
+
+  <h2>Run the CLI</h2>
+  <pre>python3 src/critic.py &lt; your-doc.txt
+python3 src/critic.py --file your-doc.txt
+python3 src/critic.py --json --file your-doc.txt   # machine-readable</pre>
+  <p>No dependencies beyond Python 3.6+ standard library.</p>
+
+  <h2>What I chose not to build, and why</h2>
+  <ul>
+    <li><b>LLM-powered semantic analysis.</b> Tone, argument structure, and logical coherence matter for executive writing. But LLMs are expensive, non-deterministic, and hard to debug when they produce a bad flag. Rules first. Measure whether they're enough. Add the LLM layer only if rules miss more than 15% of real issues in user testing.</li>
+    <li><b>Grammar checking.</b> Tools like Grammarly already do this well. This tool targets the layer above grammar: is the writing shaped for the executive audience?</li>
+    <li><b>Document formatting analysis.</b> Heading hierarchy, bullet structure, and whitespace matter. But they require document structure parsing that goes beyond plain text. That's a v2 concern.</li>
+  </ul>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani &middot; independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+
+<script>
+/* -----------------------------------------------------------------------
+   Executive Writing Critic — client-side scoring engine.
+   Same rules as the Python CLI, implemented in vanilla JS.
+   ----------------------------------------------------------------------- */
+
+// Constants
+const HEDGE_WORDS = [
+  "might", "possibly", "somewhat", "arguably", "perhaps",
+  "likely", "probably", "fairly", "rather", "quite"
+];
+const HEDGE_PHRASES = ["it seems", "i think"];
+
+const PASSIVE_RE = /\b(is|are|was|were|been|being|be|get|gets|got|gotten)\s+(\w+ly\s+)?(\w+ed|written|taken|made|done|seen|given|told|shown|built|sent|found|held|known|left|run|set|read|kept|thought|brought|bought|caught|taught|felt|lost|paid|met|put|cut)\b/i;
+
+const ADJ_SUFFIX_RE = /^\w{3,}(?:ful|ous|ive|ble|ial|ual|ent|ant|tic|less|ary|ing)$/i;
+const EXPLICIT_ADJS = new Set([
+  "good","great","big","small","new","old","long","short","high","low",
+  "best","worst","key","clear","fast","slow","hard","soft","deep","wide",
+  "real","true","false","raw","top","main","next","last","full","free",
+  "open","flat","rich","poor","safe","dark","bold","lean","sharp","quick"
+]);
+const SKIP_ADJ = new Set(["something","nothing","everything","anything"]);
+
+const NUMBER_RE = /\b\d[\d,.%$]*\b/;
+const NAMED_ENTITY_RE = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/;
+const CONCRETE_NOUNS_RE = /\b(?:team|product|customer|user|revenue|cost|quarter|year|week|month|company|market|launch|release|system|server|app|tool|budget|headcount|pipeline|roadmap|sprint|milestone|deadline|API|SDK|dashboard|database|report|metric|KPI|OKR)\b/i;
+
+// -- Helpers --
+
+function splitSentences(text) {
+  const abbrs = ["Mr.","Mrs.","Dr.","Jr.","Sr.","vs.","e.g.","i.e.","etc."];
+  let safe = text;
+  abbrs.forEach(a => { safe = safe.split(a).join(a.replace(/\./g, "<DOT>")); });
+  const parts = safe.split(/(?<=[.!?])\s+/);
+  return parts.map(p => p.replace(/<DOT>/g, ".").trim()).filter(Boolean);
+}
+
+function splitParagraphs(text) {
+  return text.trim().split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+}
+
+function countAdj(sent) {
+  const words = sent.toLowerCase().match(/\b\w+\b/g) || [];
+  let c = 0;
+  words.forEach(w => {
+    if (EXPLICIT_ADJS.has(w)) c++;
+    else if (ADJ_SUFFIX_RE.test(w) && !SKIP_ADJ.has(w)) c++;
+  });
+  return c;
+}
+
+function mean(arr) { return arr.reduce((a,b) => a+b, 0) / arr.length; }
+function stdev(arr) {
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((s,v) => s + (v-m)**2, 0) / (arr.length - 1));
+}
+
+// -- Checks --
+
+function checkHedges(sents) {
+  const findings = [];
+  let total = 0;
+  sents.forEach((s, i) => {
+    const low = s.toLowerCase();
+    const found = [];
+    HEDGE_WORDS.forEach(hw => { if (new RegExp("\\b" + hw + "\\b").test(low)) found.push(hw); });
+    HEDGE_PHRASES.forEach(hp => { if (low.includes(hp)) found.push(hp); });
+    if (found.length) {
+      total += found.length;
+      findings.push({ sentence: i+1, text: s, hedges: found });
+    }
+  });
+  const rate = total / Math.max(sents.length, 1);
+  let grade;
+  if (rate === 0) grade = "A";
+  else if (rate < 0.05) grade = "B";
+  else if (rate < 0.10) grade = "C";
+  else if (rate < 0.20) grade = "D";
+  else grade = "F";
+  return { name: "Hedge / weasel words", grade, rate: Math.round(rate*1000)/1000, hedge_count: total, findings };
+}
+
+function checkPassive(sents) {
+  let pc = 0; const findings = [];
+  sents.forEach((s, i) => {
+    if (PASSIVE_RE.test(s)) { pc++; findings.push({ sentence: i+1, text: s }); }
+  });
+  const rate = pc / Math.max(sents.length, 1);
+  let grade;
+  if (rate < 0.10) grade = "A";
+  else if (rate < 0.20) grade = "B";
+  else if (rate < 0.30) grade = "C";
+  else if (rate < 0.45) grade = "D";
+  else grade = "F";
+  return { name: "Passive voice", grade, rate: Math.round(rate*1000)/1000, passive_count: pc, findings };
+}
+
+function checkDataDensity(sents) {
+  let data = 0; const flagged = [];
+  sents.forEach((s, i) => {
+    if (NUMBER_RE.test(s)) data++;
+    else flagged.push({ sentence: i+1, text: s });
+  });
+  const ratio = sents.length ? data / sents.length : 0;
+  let grade;
+  if (ratio > 0.30) grade = "A";
+  else if (ratio > 0.20) grade = "B";
+  else if (ratio > 0.10) grade = "C";
+  else if (ratio > 0.05) grade = "D";
+  else grade = "F";
+  return { name: "Data density", grade, density: Math.round(ratio*1000)/1000, data_sentences: data, findings: flagged.slice(0, 10) };
+}
+
+function checkAdjBloat(sents) {
+  const threshold = 3; const findings = []; const counts = [];
+  sents.forEach((s, i) => {
+    const c = countAdj(s); counts.push(c);
+    if (c >= threshold) findings.push({ sentence: i+1, text: s, adjective_count: c });
+  });
+  const avg = counts.length ? mean(counts) : 0;
+  let grade;
+  if (avg < 1.0) grade = "A";
+  else if (avg < 1.5) grade = "B";
+  else if (avg < 2.0) grade = "C";
+  else if (avg < 2.5) grade = "D";
+  else grade = "F";
+  return { name: "Adjective bloat", grade, avg_per_sentence: Math.round(avg*100)/100, findings };
+}
+
+function checkVariance(sents) {
+  if (sents.length < 3) return { name: "Sentence length variance", grade: "N/A", findings: [] };
+  const lengths = sents.map(s => s.split(/\s+/).length);
+  const m = mean(lengths);
+  const sd = stdev(lengths);
+  const cv = m > 0 ? sd / m : 0;
+  let grade;
+  if (cv > 0.50) grade = "A";
+  else if (cv > 0.35) grade = "B";
+  else if (cv > 0.25) grade = "C";
+  else if (cv > 0.15) grade = "D";
+  else grade = "F";
+  const findings = (grade === "A" || grade === "B") ? [] : [{ note: `Sentences are too uniform. Mean ${m.toFixed(0)} words, stdev ${sd.toFixed(1)}. Mix in short punchy lines.` }];
+  return { name: "Sentence length variance", grade, mean_words: Math.round(m*10)/10, stdev_words: Math.round(sd*10)/10, cv: Math.round(cv*1000)/1000, findings };
+}
+
+function checkBuriedLede(paras) {
+  if (!paras.length) return { name: "Buried lede", grade: "N/A", findings: [] };
+  const first = paras[0]; const low = first.toLowerCase();
+  const actionVerbs = ["recommend","propose","request","ship","launch","build","cut","increase","reduce","approve","invest","hire","cancel","prioritize","decide","commit"];
+  const hasAction = actionVerbs.some(v => low.includes(v));
+  const hasNumber = NUMBER_RE.test(first);
+  const directives = ["we should","i recommend","the ask","my recommendation","bottom line","summary","tldr","tl;dr"];
+  const hasDirective = directives.some(d => low.startsWith(d));
+  const score = (hasAction?1:0) + (hasNumber?1:0) + (hasDirective?1:0);
+  let grade;
+  if (score >= 2) grade = "A";
+  else if (score === 1) grade = "B";
+  else {
+    const bgStarts = ["in recent","over the past","historically","as you know","background","context"];
+    grade = bgStarts.some(b => low.startsWith(b)) ? "F" : "C";
+  }
+  const findings = (grade === "C" || grade === "D" || grade === "F") ?
+    [{ text: first.slice(0, 200) + (first.length > 200 ? "..." : ""), note: "First paragraph lacks a clear ask, recommendation, or number. Lead with the point." }] : [];
+  return { name: "Buried lede", grade, findings };
+}
+
+function checkOpening(paras) {
+  if (!paras.length) return { name: "Opening specificity", grade: "N/A", findings: [] };
+  const first = paras[0];
+  const hasNum = NUMBER_RE.test(first);
+  const hasEntity = NAMED_ENTITY_RE.test(first);
+  const hasConcrete = CONCRETE_NOUNS_RE.test(first);
+  const score = (hasNum?1:0) + (hasEntity?1:0) + (hasConcrete?1:0);
+  let grade;
+  if (score >= 2) grade = "A";
+  else if (score === 1) grade = "B";
+  else grade = "D";
+  const findings = (grade === "C" || grade === "D" || grade === "F") ?
+    [{ text: first.slice(0, 200) + (first.length > 200 ? "..." : ""), note: "Opening lacks concrete nouns, numbers, or named entities." }] : [];
+  return { name: "Opening specificity", grade, findings };
+}
+
+// -- Scoring --
+
+const GRADE_VAL = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+function letterFromGPA(gpa) {
+  if (gpa >= 3.5) return "A";
+  if (gpa >= 2.5) return "B";
+  if (gpa >= 1.5) return "C";
+  if (gpa >= 0.5) return "D";
+  return "F";
+}
+
+function scoreDocument(text) {
+  const sents = splitSentences(text);
+  const paras = splitParagraphs(text);
+  const checks = [
+    checkHedges(sents), checkPassive(sents), checkDataDensity(sents),
+    checkAdjBloat(sents), checkVariance(sents), checkBuriedLede(paras), checkOpening(paras)
+  ];
+  const graded = checks.filter(c => c.grade !== "N/A");
+  const gpa = graded.length ? graded.reduce((s,c) => s + GRADE_VAL[c.grade], 0) / graded.length : 0;
+  return {
+    overall_grade: graded.length ? letterFromGPA(gpa) : "N/A",
+    gpa: Math.round(gpa * 100) / 100,
+    sentence_count: sents.length,
+    paragraph_count: paras.length,
+    word_count: text.split(/\s+/).filter(Boolean).length,
+    checks
+  };
+}
+
+// -- UI --
+
+function gradeClass(g) {
+  if (g === "A" || g === "B") return "grade-a";
+  if (g === "C" || g === "D") return "grade-c";
+  if (g === "F") return "grade-f";
+  return "";
+}
+
+function esc(s) {
+  const d = document.createElement("div"); d.textContent = s; return d.innerHTML;
+}
+
+function renderResults(r) {
+  let html = `
+    <div class="overall">
+      <div class="overall-grade ${gradeClass(r.overall_grade)}">${r.overall_grade}</div>
+      <div class="overall-gpa">GPA ${r.gpa.toFixed(2)}</div>
+      <div class="overall-stats">${r.word_count} words &middot; ${r.sentence_count} sentences &middot; ${r.paragraph_count} paragraphs</div>
+    </div>`;
+
+  r.checks.forEach((check, idx) => {
+    const hasFindings = check.findings && check.findings.length > 0;
+    html += `<div class="check-card${hasFindings ? "" : ""}" data-idx="${idx}">
+      <div class="check-header" onclick="toggleCheck(this)">
+        <span class="check-name">${esc(check.name)}</span>
+        <span class="check-grade ${gradeClass(check.grade)}">${check.grade}</span>
+      </div>
+      <div class="check-body">`;
+
+    // Metrics row
+    html += `<div class="check-metrics">`;
+    const skip = new Set(["name","grade","findings"]);
+    for (const [k,v] of Object.entries(check)) {
+      if (skip.has(k)) continue;
+      if (Array.isArray(v)) continue;
+      const label = k.replace(/_/g, " ");
+      html += `<span>${label}: <b>${v}</b></span>`;
+    }
+    html += `</div>`;
+
+    // Findings
+    if (check.findings) {
+      check.findings.slice(0, 5).forEach(f => {
+        if (f.text) {
+          const snippet = f.text.length > 120 ? f.text.slice(0, 120) + "..." : f.text;
+          let extra = "";
+          if (f.hedges) extra = f.hedges.map(h => `<span class="hedge-tag">${esc(h)}</span>`).join(" ");
+          else if (f.adjective_count) extra = `<span class="hedge-tag">${f.adjective_count} adj</span>`;
+          html += `<div class="finding"><span class="sent-num">S${f.sentence}</span>${esc(snippet)} ${extra}</div>`;
+        }
+        if (f.note) {
+          html += `<div class="finding-note">${esc(f.note)}</div>`;
+        }
+      });
+      if (check.findings.length > 5) {
+        html += `<div class="finding-note">...and ${check.findings.length - 5} more findings</div>`;
+      }
+    }
+
+    html += `</div></div>`;
+  });
+
+  return html;
+}
+
+function toggleCheck(el) {
+  el.parentElement.classList.toggle("open");
+}
+
+function runScore() {
+  const text = document.getElementById("input").value.trim();
+  if (!text) return;
+  const result = scoreDocument(text);
+  const container = document.getElementById("results");
+  container.innerHTML = renderResults(result);
+  container.classList.add("show");
+  container.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function clearAll() {
+  document.getElementById("input").value = "";
+  document.getElementById("results").innerHTML = "";
+  document.getElementById("results").classList.remove("show");
+  updateCount();
+}
+
+function updateCount() {
+  const text = document.getElementById("input").value.trim();
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  document.getElementById("char-count").textContent = words + " word" + (words !== 1 ? "s" : "");
+}
+
+document.getElementById("input").addEventListener("input", updateCount);
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coverage Gap Detector</title>
+<meta name="description" content="A measurement tool that evaluates whether a daily executive news brief adequately covered what was available from public sources. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Measurement tool · Working code</span>
+      <h1>Coverage gap detector for executive news briefs</h1>
+      <p>Building a measurable quality metric for a fuzzy editorial problem: did today's brief actually cover what was available, or did it just look like it did?</p>
+      <div class="meta"><span>Built <b>October 2026</b></span><span>Type <b>Evaluation tool</b></span><span>Stack <b>Python · RSS · News APIs</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="tldr"><p><b>Short version.</b> A daily executive news brief is only as good as the stories it catches. This tool measures coverage by sweeping public sources for a roster of entities over a time window, then scoring any candidate brief against what was actually available. The output is a coverage score, an entity-by-entity breakdown, and a list of stories the brief missed that multiple sources carried.</p></div>
+
+  <h2>The problem</h2>
+  <p>A daily news brief for a senior leader looks fine if you only read it forwards. The articles are sourced, the summaries are accurate, the format is clean. But <b>"is this brief correct?"</b> and <b>"is this brief complete?"</b> are different questions, and most quality checks only answer the first one.</p>
+  <p>Completeness is harder to measure because you need to know what was available before you can judge what was missed. And the misses come in two flavors:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Class of miss</th><th>What it means</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><b>Roster definition problem</b></td><td>You're tracking the wrong entities entirely</td><td>The brief tracks 50 companies but the 3 most relevant ones aren't on the list</td></tr>
+      <tr><td><b>Search-breadth problem</b></td><td>You're tracking the right entities but not finding stories that existed</td><td>A CEO resigned, 4 major outlets covered it, but the brief didn't include it because the search didn't reach those sources</td></tr>
+    </tbody>
+  </table></div>
+  <p>You can't fix what you can't measure. This tool measures both.</p>
+
+  <h2>What it does</h2>
+  <ol>
+    <li><b>Input a roster</b> of entities to track (people, companies, or both) and a time window (today, last 24 hours, a specific date range).</li>
+    <li><b>The tool sweeps public sources</b> — RSS feeds from major news outlets — and collects every headline mentioning a rostered entity.</li>
+    <li><b>Deduplication.</b> Syndicated and wire stories appear in many outlets under near-identical headlines. The tool clusters these so one AP story picked up by 12 outlets counts once, not twelve times.</li>
+    <li><b>Evaluate a candidate brief.</b> Paste or pipe in the text of a brief, and the tool scores it against the available-story universe.</li>
+  </ol>
+  <p>The output is a coverage report:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Metric</th><th>What it tells you</th></tr></thead>
+    <tbody>
+      <tr><td><b>Coverage score</b> (0–100)</td><td>What fraction of available consensus stories appeared in the brief</td></tr>
+      <tr><td><b>Entity coverage breakdown</b></td><td>For each rostered entity: stories available vs. stories the brief mentioned</td></tr>
+      <tr><td><b>Syndication dedup ratio</b></td><td>How many raw headlines collapsed into how many unique stories (measures source diversity)</td></tr>
+      <tr><td><b>Missed-consensus report</b></td><td>Stories carried by 2+ sources that the brief omitted — the most actionable output</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Architecture</h2>
+  <p>The system has four stages, each deliberately simple:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Stage</th><th>Input</th><th>Output</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>1. Roster load</td><td>JSON config file</td><td>Entity list with aliases</td><td>Flat file, no database</td></tr>
+      <tr><td>2. Source sweep</td><td>Entity list + date window</td><td>Raw headline corpus</td><td>RSS feeds via feedparser or stdlib XML</td></tr>
+      <tr><td>3. Dedup</td><td>Raw headlines</td><td>Unique story clusters</td><td>Title similarity (sequence matching)</td></tr>
+      <tr><td>4. Evaluation</td><td>Unique stories + brief text</td><td>Coverage report</td><td>Entity mention matching + story overlap scoring</td></tr>
+    </tbody>
+  </table></div>
+  <p>Each stage is a pure function. You can swap out the source sweep (say, from RSS to a news API) without touching the evaluator. You can test the scoring logic without any network calls at all.</p>
+
+  <h2>Scope discipline</h2>
+  <p>I built the evaluator, not the generator. The evaluator is the interesting half; the generator is a commodity.</p>
+  <p>Any LLM can summarize ten articles into a brief. The hard part is knowing whether those ten articles were the right ten. That's a measurement problem, not a generation problem, and it's the one that scales: once you can score a brief's coverage, you can score any brief — written by a person, an AI, or a mix — and you can track quality over time.</p>
+
+  <h2>Results</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Measure</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Correctly identifies entity mentions</td><td class="num"><b>Tested across 10-entity roster</b></td></tr>
+      <tr><td>Syndication dedup</td><td class="num">Clusters near-identical headlines at 0.75 similarity</td></tr>
+      <tr><td>Missed-consensus detection</td><td class="num">Flags stories from 2+ sources absent from brief</td></tr>
+      <tr><td>End-to-end scoring</td><td class="num">0–100 coverage score on any brief text</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">These are structural results — the tool works as designed. Real-world accuracy metrics require running it against a production brief, which would involve non-public data. The architecture is built to make that measurement trivial once you plug in your own roster and sources.</p>
+
+  <h2>What I chose not to build, and why</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omission</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>A brief generator</td><td>Commodity problem. The evaluator is the differentiator — it tells you whether the generator did its job.</td></tr>
+      <tr><td>Real-time monitoring</td><td>Different product with different infrastructure. This is a batch evaluation tool: run it once a day, after the brief is assembled, and get a score.</td></tr>
+      <tr><td>Multi-language support</td><td>English sources only. Internationalization adds complexity without validating the core measurement idea.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What I'd build next</h2>
+  <ul>
+    <li><b>Historical trending.</b> Store daily scores and chart coverage quality over weeks or months. Does coverage degrade when a team member is out? Does it improve after adding a source?</li>
+    <li><b>Source-quality scoring.</b> Not all sources are equal. Weight coverage by outlet tier (wire services, major national, trade, blog) so a miss from Reuters counts more than a miss from a niche aggregator.</li>
+    <li><b>Roster tuning recommendations.</b> If an entity never generates stories, suggest removing it. If a non-rostered entity keeps appearing in missed stories, suggest adding it.</li>
+    <li><b>News API integration.</b> RSS is free and sufficient for a proof of concept. A production version would use a news API for better date filtering, richer metadata, and higher reliability.</li>
+  </ul>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani · independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>
