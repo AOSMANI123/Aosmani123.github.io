@@ -63,16 +63,40 @@
   <p><span class="pill hyp">Hypothesis</span> The naive prompt fills in missing fields. Explicit rules bring fabrication close to zero without hurting recall.</p>
 
   <h2>Results so far</h2>
+  <p>First real-model run: October 7, 2026, <code>claude-sonnet-5</code>, one run per prompt.</p>
   <div class="table-wrap"><table>
-    <thead><tr><th>Drafter</th><th>Recall</th><th>Fabrication</th><th>Status</th></tr></thead>
+    <thead><tr><th>Drafter</th><th>Recall</th><th>Fabrication (as scored)</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td>Faithful mock (checks the scorer)</td><td class="num">96/96</td><td class="num">0/12</td><td><span class="pill yes">Verified</span></td></tr>
       <tr><td>Fabricating mock (checks the scorer)</td><td class="num">96/96</td><td class="num">12/12 caught</td><td><span class="pill yes">Verified</span></td></tr>
-      <tr><td>Real model, naive prompt</td><td class="num"></td><td class="num"></td><td><span class="pill">Not yet run</span></td></tr>
-      <tr><td>Real model, rules prompt</td><td class="num"></td><td class="num"></td><td><span class="pill">Not yet run</span></td></tr>
+      <tr><td>Real model, naive prompt</td><td class="num">96/96</td><td class="num">10/12</td><td><span class="pill">Run once</span></td></tr>
+      <tr><td>Real model, rules prompt</td><td class="num">92/96</td><td class="num">1/12</td><td><span class="pill">Run once</span></td></tr>
     </tbody>
   </table></div>
-  <p>The mock rows prove the scorer works: it gives a perfect drafter full marks and catches every invented value from a bad one. Real model results go here once they're run, including the cases each prompt still misses.</p>
+  <p>Zero wrong values and zero invented numbers in both runs.</p>
+
+  <h2>What the failures actually were</h2>
+  <p>On paper, the rules prompt cut fabrication from 83% to 8%. Reading each failure tells a more useful story.</p>
+  <p><strong>Most of the naive prompt's "fabrications" were honest answers in the wrong words.</strong> Seven of the ten were the model declining to guess, writing <code>Not specified</code> or <code>TBD</code> instead of <code>UNKNOWN</code>. The naive prompt never asked for <code>UNKNOWN</code>, so this partly measures format, not honesty.</p>
+  <p><strong>Three were real problems:</strong></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Case</th><th>What the model wrote</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>Virtual event</td><td>Audience: "40,000 (based on last year's stream)"</td><td>The trap worked. The invented-number check missed it, because 40,000 is in the source, just about a different event.</td></tr>
+      <tr><td>No signature</td><td>Requestor: "Pacific Retail Association events team"</td><td>No person signed, so the model put a team in a name field.</td></tr>
+      <tr><td>Vague crowd</td><td>Moderator: "Priya Nand"</td><td>Priya is the emcee who introduces the keynote. A role mix-up, not an invented person.</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="pill hyp">Hypothesis check</span> Partly confirmed. The rules prompt fixed two of the three real problems. The Priya Nand case survived both prompts, which points at the schema (there's no "introducer" field) rather than the prompt. And the rules weren't free: the model marked 4 stated fields <code>UNKNOWN</code>. A blank still beats a guess in an executive briefing, but it's a trade-off to measure, not assume.</p>
+  <p>The honest fabrication count for the naive prompt is closer to 3 of 12 than 10 of 12. The mocks proved the scorer works mechanically. The real run showed that working mechanically and measuring the right thing are different claims.</p>
+
+  <h2>What I'm changing next</h2>
+  <ul>
+    <li>Accept honest blanks in any wording (<code>Not specified</code>, <code>TBD</code>) so fabrication measures invention, not formatting.</li>
+    <li>Add a check that last year's figures stay out of this year's fields. A copied number can still be the wrong number.</li>
+    <li>Decide case 02's answer key: add an introducer field, or document that an emcee isn't a moderator.</li>
+    <li>Run each prompt several times before trusting a pass gate. These are single runs.</li>
+  </ul>
 
   <h2>Run it</h2>
 <pre>python3 -m unittest discover -s tests

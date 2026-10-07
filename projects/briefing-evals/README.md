@@ -39,18 +39,45 @@ Golden-set regression testing for prompts, focused on factual accuracy in struct
 
 ## Results
 
-The uncomfortable finding: nondeterminism is not noise you can ignore.
+First real-model run: October 7, 2026, `claude-sonnet-5`, one run per prompt.
 
-| Drafter | Recall | Fabrication rate | Status |
+| Drafter | Recall | Fabrication rate (as scored) | Status |
 |---|---|---|---|
 | mock-faithful (scorer self-check) | 96/96 | 0/12 | Verified |
 | mock-fabricator (scorer self-check) | 96/96 | 12/12 caught | Verified |
-| Real model, naive prompt | | | Not yet run |
-| Real model, flag-gaps prompt | | | Not yet run |
+| Real model, naive prompt | 96/96 (100%) | 10/12 (83%) | Run once |
+| Real model, flag-gaps prompt | 92/96 (96%) | 1/12 (8%) | Run once |
 
-The mock rows prove the scorer works: a perfect drafter gets full marks, and every invented value from a bad drafter is caught.
+Wrong values: 0 in both runs. Invented numbers: 0 in both runs.
 
-The real-model rows, once populated, will document the rate at which a nondeterministic agent fails a test it passed yesterday with no code change. This is the number most teams don't measure, and the reason a pass gate needs a threshold rather than a binary check.
+### What the failures actually were
+
+The headline says the gap-flagging prompt cut fabrication from 83% to 8%. Reading each failure tells a more useful story.
+
+**Most of the naive prompt's "fabrications" were honest answers in the wrong words.** Seven of the ten flagged fields were the model declining to guess, just not in the format the scorer expects: `"Not specified"`, `"TBD"`, `"TBD (not yet locked…)"`. The scorer only counts the literal `UNKNOWN` as a blank, so it scored those as fabrications. The naive prompt never asked for `UNKNOWN`, so this measures format compliance as much as honesty.
+
+**Three were real problems:**
+
+| Case | What the model wrote | Why it matters |
+|---|---|---|
+| 05 virtual | audience_size: `"40,000 (based on last year's stream)"` | The trap worked: last year's number was carried into this year's briefing. The invented-number check missed it because 40,000 *is* in the source, just about a different event. |
+| 11 no signature | requestor_name: `"Pacific Retail Association events team"` | No person signed the email; the model filled the name field with a team. |
+| 02 vague crowd | moderator: `"Priya Nand"` | Priya is named in the source as the emcee who introduces the keynote, not a moderator. A role mix-up, not an invented person. |
+
+**The gap-flagging prompt fixed two of the three.** Only the Priya Nand case survived, and it appeared under both prompts. That points at the schema rather than the prompt: there is no field for "introducer," so the model reaches for the nearest one.
+
+**It cost some recall.** The stricter prompt marked 4 fields `UNKNOWN` that the source did state. A blank is still safer than a guess in an executive briefing, but it is a real trade-off and worth measuring rather than assuming.
+
+So the honest real-world fabrication count under the naive prompt is closer to 3 of 12 than 10 of 12, and the stricter prompt brings it to 1.
+
+### What this changed about the harness
+
+1. **The scorer should accept honest blanks in any wording.** Treat `Not specified`, `TBD`, `N/A` and similar as `UNKNOWN`, so the fabrication metric measures invention, not formatting. Otherwise the naive prompt looks far worse than it is, and a team might "fix" the wrong problem.
+2. **The invented-number check needs context.** A number copied from the source can still be wrong if it describes a different event. Case 05 needs a field-level check that last year's figures stay out of this year's fields.
+3. **Case 02's answer key needs a decision.** Either add an introducer field or document that an emcee is not a moderator.
+4. **Run each prompt several times before trusting a gate.** These are single runs. The nondeterminism threshold in [ADR-001](docs/decisions/ADR-001-nondeterminism-threshold.md) still needs N repeated runs to calibrate.
+
+The mock rows prove the scorer works mechanically: a perfect drafter gets full marks, and every invented value from a bad drafter is caught. The real-model rows show that "works mechanically" and "measures the right thing" are different claims.
 
 ## Architecture
 
