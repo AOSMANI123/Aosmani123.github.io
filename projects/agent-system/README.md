@@ -4,7 +4,7 @@
 
 ## Problem
 
-A CEO's office receives hundreds of engagement requests — speaking invitations, customer meetings, events, media inquiries. These flow in through email, forms and forwarded messages, and each one requires intake processing, priority assessment, scheduling checks, briefing preparation and follow-up. At scale, manual processing breaks down: requests get lost, briefings get assembled from scratch every time, and there is no systematic way to evaluate whether a briefing actually covered what the executive needed.
+An executive's office receives hundreds of engagement requests — speaking invitations, customer meetings, events, media inquiries. These flow in through email, forms and forwarded messages, and each one requires intake processing, priority assessment, scheduling checks, briefing preparation and follow-up. At scale, manual processing breaks down: requests get lost, briefings get assembled from scratch every time, and there is no systematic way to evaluate whether a briefing actually covered what the executive needed.
 
 ## Why now
 

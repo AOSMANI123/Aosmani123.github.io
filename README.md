@@ -2,7 +2,7 @@
 
 **Live site: [aosmani123.github.io](https://aosmani123.github.io)**
 
-I build AI systems and operating models for executive teams. I've spent five years inside two CEO offices, at Amazon and Microsoft, and I came to tech through Microsoft's ACE rotation program in product marketing and product research. I start by talking to the people doing the work, find the real constraint, and build around it.
+I build AI systems and operating models for executive teams. I've spent five years supporting senior executives at Amazon and Microsoft, and I came to tech through Microsoft's ACE rotation program in product marketing and product research. I start by talking to the people doing the work, find the real constraint, and build around it.
 
 This repo is my personal site and the projects on it.
 
@@ -10,8 +10,8 @@ This repo is my personal site and the projects on it.
 
 | Project | What it is | Type |
 |---|---|---|
-| [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) | Multi-agent orchestration managing 200+ CEO engagement items across intake, triage, briefing production and knowledge retrieval. | Shipped |
-| [AI-powered engagement automation](https://aosmani123.github.io/projects/oceo-automation/) | Rebuilt a CVP's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. | Shipped |
+| [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) | Multi-agent orchestration managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. | Shipped |
+| [AI-powered engagement automation](https://aosmani123.github.io/projects/engagement-automation/) | Rebuilt an executive's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. | Shipped |
 | [Executive writing critic](https://aosmani123.github.io/projects/writing-critic/) | Seven deterministic checks against an executive writing bar. CLI + web scorer. Python stdlib, no dependencies. | Working code |
 | [Coverage gap detector](https://aosmani123.github.io/projects/coverage-gap/) | Evaluates whether a news brief covers what was actually available. Coverage score, entity breakdown, missed-consensus report. | Working code |
 | [LLM prompt eval harness](https://aosmani123.github.io/projects/briefing-evals/) | Golden-set regression testing for prompts. Nondeterminism-tolerant assertions and a pass gate that blocks regressions. | Working code |
@@ -37,7 +37,7 @@ index.html                     personal site
 assets/project.css             shared styles for project pages
 projects/
   agent-system/                seven-agent system architecture (shipped)
-  oceo-automation/             AI engagement automation case study (Microsoft)
+  engagement-automation/       AI engagement automation case study (Microsoft)
   writing-critic/              executive writing scorer — CLI + web demo
   coverage-gap/                coverage gap detector for news briefs
   briefing-evals/              LLM prompt eval harness, 12 cases, tests
