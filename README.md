@@ -11,6 +11,7 @@ This repo is my personal site and the projects on it.
 | Project | What it is | Type |
 |---|---|---|
 | [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) | Multi-agent orchestration managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. | Shipped |
+| [Engagement Agents (code)](https://github.com/AOSMANI123/engagement-agents) | Runnable public version of the agent system: intake, validation, triage and drafting, with a review queue and no send step. | Working code |
 | [AI-powered engagement automation](https://aosmani123.github.io/projects/engagement-automation/) | Rebuilt an executive's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. | Shipped |
 | [Executive writing critic](https://aosmani123.github.io/projects/writing-critic/) | Seven deterministic checks against an executive writing bar. CLI + web scorer. Python stdlib, no dependencies. | Working code |
 | [Coverage gap detector](https://aosmani123.github.io/projects/coverage-gap/) | Evaluates whether a news brief covers what was actually available. Coverage score, entity breakdown, missed-consensus report. | Working code |
