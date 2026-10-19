@@ -10,6 +10,7 @@ This repo is my personal site and the projects on it.
 
 | Project | What it is | Type |
 |---|---|---|
+| [AI policy desk](https://aosmani123.github.io/projects/policy-desk/) | Interactive explainer mapping live U.S. AI policy questions onto the five-layer AI stack, with a sourced brief, one-pager and LinkedIn draft per layer from a monitored agent pipeline. Human holds the only publish button. | Prototype |
 | [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) | Multi-agent orchestration managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. | Shipped |
 | [Engagement Agents (code)](https://github.com/AOSMANI123/engagement-agents) | Runnable public version of the agent system: intake, validation, triage and drafting, with a review queue and no send step. | Working code |
 | [AI-powered engagement automation](https://aosmani123.github.io/projects/engagement-automation/) | Rebuilt an executive's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. | Shipped |
@@ -37,6 +38,7 @@ One rule runs through every AI system I build: **the human is always the final s
 index.html                     personal site
 assets/project.css             shared styles for project pages
 projects/
+  policy-desk/                 AI policy desk — five-layer explainer + content pipeline
   agent-system/                seven-agent system architecture (shipped)
   engagement-automation/       AI engagement automation case study (Microsoft)
   writing-critic/              executive writing scorer — CLI + web demo
