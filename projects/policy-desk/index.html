@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI Policy Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="An unofficial policy desk that maps live U.S. AI policy questions onto the five-layer AI stack, with a sourced brief, one-pager and LinkedIn draft per layer, produced by a monitored agent pipeline with human sign-off. Independent work by Atif Osmani.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: the portfolio's indigo title band, then a working desk. The five-layer stack is the hero control; everything below it is what one click produces. Marigold marks the thing that matters; teal marks a link or a human step. */
+:root{
+  --paper:#EEEFEA; --sheet:#FAFAF7; --ink:#1B1F33; --muted:#565B6B; --rule:#D5D7D0;
+  --indigo:#1D2340; --on-indigo:#EDEBE3; --on-indigo-muted:#B9B8C8;
+  --marigold:#E4A62A; --mark-bg:#F2C866; --teal:#1C605B; --teal-soft:#DCE9E6;
+  --warn:#9B3B2E; --warn-soft:#F3E1DC;
+  --display:'Young Serif',Georgia,'Times New Roman',serif;
+  --body:'Public Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'DM Mono',ui-monospace,Menlo,monospace;
+  --maxw:66rem;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12152A;--sheet:#191D34;--ink:#E9E8E1;--muted:#A3A5B6;--rule:#2B3049;
+  --indigo:#0C0F20;--on-indigo:#EDEBE3;--on-indigo-muted:#A9A8BA;
+  --marigold:#E9B447;--mark-bg:#7A5A12;--teal:#78C4BA;--teal-soft:#1B3431;
+  --warn:#E29A8C;--warn-soft:#3A2420;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12152A;--sheet:#191D34;--ink:#E9E8E1;--muted:#A3A5B6;--rule:#2B3049;
+  --indigo:#0C0F20;--on-indigo:#EDEBE3;--on-indigo-muted:#A9A8BA;
+  --marigold:#E9B447;--mark-bg:#7A5A12;--teal:#78C4BA;--teal-soft:#1B3431;
+  --warn:#E29A8C;--warn-soft:#3A2420;color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.02rem;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:700px){.wrap{padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:max(40px,env(safe-area-inset-right,0px))}}
+a{color:var(--teal);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--marigold);outline-offset:3px;border-radius:2px}
+h1,h2,h3,h4{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
+p{margin:0}
+.label{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg) 86%,transparent 86%);color:inherit;padding:0 .1em}
+
+/* band */
+.band{background:var(--indigo);color:var(--on-indigo)}
+.top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:20px;border-bottom:1px solid rgba(237,235,227,.16);font-family:var(--mono);font-size:.78rem}
+.top a{color:var(--on-indigo-muted);text-decoration:none}
+.top a:hover{color:var(--marigold)}
+.head{padding-block:clamp(44px,7vw,84px) clamp(36px,5vw,60px)}
+.head .label{color:var(--marigold)}
+.head h1{font-size:clamp(2.1rem,5.4vw,3.8rem);line-height:1.06;max-width:16ch;margin-top:16px}
+.head h1 em{font-style:normal;color:var(--marigold)}
+.head .lede{max-width:40rem;font-size:1.15rem;color:var(--on-indigo-muted);margin-top:22px}
+.head .lede b{color:var(--on-indigo);font-weight:500}
+.meta{display:flex;flex-wrap:wrap;gap:8px 30px;margin-top:34px;padding-top:16px;border-top:1px solid rgba(237,235,227,.16);font-family:var(--mono);font-size:.78rem;color:var(--on-indigo-muted)}
+.meta b{color:var(--on-indigo);font-weight:500}
+
+/* sections */
+main{padding-block:10px 40px}
+section{padding-block:clamp(40px,5vw,64px);border-top:1px solid var(--rule)}
+section:first-of-type{border-top:0}
+section h2{font-size:clamp(1.6rem,3.2vw,2.2rem);line-height:1.15;margin-bottom:14px}
+.intro{max-width:42rem;color:var(--muted)}
+.intro+.intro{margin-top:10px}
+.tldr{margin-top:34px;background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--marigold);padding:18px 22px;max-width:52rem}
+.tldr b{font-weight:600}
+
+/* stack control */
+.stack{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.stack button{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;border:1px solid var(--rule);background:var(--sheet);padding:14px 14px 12px;min-width:0;transition:border-color .15s,background .15s}
+.stack button:hover{border-color:var(--ink)}
+.stack button .n{font-family:var(--mono);font-size:.7rem;color:var(--teal);display:block}
+.stack button b{display:block;font-family:var(--display);font-weight:400;font-size:1.15rem;margin:4px 0 4px}
+.stack button span.s{display:block;font-size:.84rem;color:var(--muted);line-height:1.4}
+.stack button[aria-selected="true"]{border-color:var(--marigold);box-shadow:inset 0 3px 0 var(--marigold);background:var(--paper)}
+.stack button[aria-selected="true"] b{color:var(--ink)}
+@media (max-width:760px){.stack{grid-template-columns:repeat(2,minmax(0,1fr))}.stack li:last-child{grid-column:span 2}}
+
+/* panel */
+.panel{margin-top:22px;border:1px solid var(--rule);background:var(--sheet)}
+.panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 20px;align-items:baseline;padding:18px 22px;border-bottom:1px solid var(--rule)}
+.panel-head h3{font-size:1.5rem}
+.panel-head .label{}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
+.cols>div{padding:20px 22px;min-width:0}
+.cols>div+div{border-left:1px solid var(--rule)}
+@media (max-width:760px){.cols{grid-template-columns:1fr}.cols>div+div{border-left:0;border-top:1px solid var(--rule)}}
+.cols h4{font-family:var(--mono);font-weight:500;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.cols ul{margin:0;padding-left:1.1rem;font-size:.95rem}
+.cols li{margin-bottom:8px}
+.cols li:last-child{margin-bottom:0}
+.src{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.none{border:1px dashed var(--warn);background:var(--warn-soft);color:var(--ink);padding:10px 12px;font-size:.9rem;margin-top:8px}
+.none b{color:var(--warn)}
+
+/* outputs */
+.outs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--rule)}
+.outs>div{padding:20px 22px;min-width:0;border-left:1px solid var(--rule)}
+.outs>div:first-child{border-left:0}
+@media (max-width:900px){.outs{grid-template-columns:1fr}.outs>div{border-left:0;border-top:1px solid var(--rule)}.outs>div:first-child{border-top:0}}
+.outs h4{font-family:var(--mono);font-weight:500;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;display:flex;justify-content:space-between;gap:8px}
+.outs h4 span{color:var(--muted);letter-spacing:0;text-transform:none;font-size:.7rem}
+.doc{background:var(--paper);border:1px solid var(--rule);padding:16px;font-size:.92rem;line-height:1.55}
+.doc .t{font-family:var(--display);font-size:1.12rem;margin-bottom:8px}
+.doc p+p{margin-top:8px}
+.doc ul{margin:8px 0 0;padding-left:1.1rem}
+.doc .fn{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px dashed var(--rule)}
+.post{white-space:pre-wrap}
+.copy{all:unset;box-sizing:border-box;cursor:pointer;font-family:var(--mono);font-size:.7rem;color:var(--teal);border-bottom:1px solid var(--teal)}
+.copy:hover{color:var(--marigold);border-color:var(--marigold)}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font-family:var(--mono);font-size:.7rem;border:1px solid var(--rule);padding:3px 8px;color:var(--muted)}
+
+/* pipeline */
+.pipe{margin-top:28px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.node{border:1px solid var(--rule);background:var(--sheet);padding:14px;min-width:0}
+.node .label{font-size:.66rem}
+.node b{display:block;font-family:var(--display);font-weight:400;font-size:1.08rem;margin:4px 0 6px}
+.node p{font-size:.86rem;color:var(--muted);line-height:1.45}
+.node.human{border-style:dashed;border-color:var(--teal)}
+.node.human .label{color:var(--teal)}
+.node.gate{border-color:var(--marigold);box-shadow:inset 3px 0 0 var(--marigold)}
+@media (max-width:900px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}.pipe .node:last-child{grid-column:span 2}}
+@media (max-width:480px){.pipe{grid-template-columns:1fr}.pipe .node:last-child{grid-column:auto}}
+.two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;margin-top:28px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.two>div{min-width:0}
+.two h3{font-size:1.2rem;margin-bottom:10px}
+.tabpanel .two{min-width:0}
+.panel-head .label{white-space:normal}
+.tabs button{white-space:normal;text-align:left}
+.rules{list-style:none;padding:0;margin:0;border-top:2px solid var(--ink)}
+.rules li{padding:10px 0;border-bottom:1px solid var(--rule);font-size:.93rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px}
+.rules li .k{font-family:var(--mono);font-size:.7rem;color:var(--warn);padding-top:.3rem;white-space:nowrap}
+
+/* tables */
+.table-wrap{overflow-x:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--rule)}
+th{font-family:var(--mono);font-weight:500;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink)}
+td.m{font-family:var(--mono);font-size:.78rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill{font-family:var(--mono);font-size:.66rem;padding:2px 7px;border:1px solid var(--rule);white-space:nowrap}
+.pill.ok{color:var(--teal);border-color:var(--teal)}
+.pill.hold{color:var(--warn);border-color:var(--warn)}
+.pill.edit{color:var(--marigold);border-color:var(--marigold)}
+
+/* kit tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:0;margin-top:24px;border-bottom:2px solid var(--ink)}
+.tabs button{all:unset;box-sizing:border-box;cursor:pointer;font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--marigold)}
+.tabpanel{padding-top:18px}
+.kit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.kit-grid{grid-template-columns:1fr}}
+.wk{border:1px solid var(--rule);background:var(--sheet);padding:14px;min-width:0}
+.wk b{font-family:var(--display);font-weight:400;display:block;font-size:1.05rem}
+.wk .label{display:block;margin-bottom:4px}
+.wk ul{margin:8px 0 0;padding-left:1.05rem;font-size:.88rem;color:var(--muted)}
+.wk li{margin-bottom:5px}
+.note{font-size:.9rem;color:var(--muted);margin-top:12px;max-width:46rem}
+.srcs{columns:2;column-gap:32px;font-size:.86rem;padding-left:1.1rem;margin:14px 0 0}
+.srcs li{break-inside:avoid;margin-bottom:6px}
+@media (max-width:760px){.srcs{columns:1}}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-block:22px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">← Atif Osmani</a><a href="../../#projects">All projects</a></div>
+    <header class="head">
+      <span class="label">Policy marketing · Working prototype · Unofficial</span>
+      <h1>A policy desk for the <em>five-layer</em> AI stack</h1>
+      <p class="lede">Policymakers don't need another explainer of how GPUs work. They need to know <b>which live question lands on which layer</b> of the AI economy, what the company on the record has already said about it, and what a staffer can read in ninety seconds. This desk does that for all five layers, and an agent pipeline keeps it current without ever publishing on its own.</p>
+      <div class="meta"><span>Built <b>October 2026</b></span><span>Audience <b>Policy &amp; government-affairs comms</b></span><span>Outputs <b>Brief · One-pager · LinkedIn</b></span><span>Pipeline <b>Monitor → Classify → Draft → Source-check → Human</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="why">
+  <h2>Why this exists</h2>
+  <p class="intro">In March 2026 NVIDIA's CEO described AI as a five-layer cake: energy, chips, infrastructure, models, applications. It is a good frame for engineers. It is an even better frame for Washington, because almost every live policy fight in 2026 sits cleanly on one layer, and the people arguing about them rarely say which.</p>
+  <p class="intro">A policy marketing team's job is to translate priorities into content a non-technical audience can use, fast, and without putting words in the company's mouth. So the test I set myself: can I build a desk that produces a sourced brief, a one-pager and a social post for any layer, on demand, with every claim traceable, and with a human holding the only publish button?</p>
+  <div class="tldr"><p><b>Short version.</b> Pick a layer below. You get the live U.S. policy questions on that layer, the company's <mark>published</mark> position with links to the primary document, a 150-word brief written for a Hill staffer, a one-pager skeleton with third-party validators, and a LinkedIn draft. Where no published position exists, the desk says so instead of inventing one. Everything here is built from public sources and is not affiliated with NVIDIA.</p></div>
+</section>
+
+<section id="desk">
+  <h2>The desk</h2>
+  <p class="intro">Five layers, one click each. The content is current as of October 19, 2026 and was produced by the pipeline described further down, then edited by me.</p>
+
+  <ul class="stack" role="tablist" aria-label="AI stack layers">
+    <li><button role="tab" id="tab-energy" aria-controls="panel" aria-selected="true" data-layer="energy"><span class="n">Layer 1</span><b>Energy</b><span class="s">Grid, interconnection, ratepayers</span></button></li>
+    <li><button role="tab" id="tab-chips" aria-controls="panel" aria-selected="false" data-layer="chips"><span class="n">Layer 2</span><b>Chips</b><span class="s">Export controls, chip security, Build in America</span></button></li>
+    <li><button role="tab" id="tab-infra" aria-controls="panel" aria-selected="false" data-layer="infra"><span class="n">Layer 3</span><b>Infrastructure</b><span class="s">AI factories, siting, skilled trades</span></button></li>
+    <li><button role="tab" id="tab-models" aria-controls="panel" aria-selected="false" data-layer="models"><span class="n">Layer 4</span><b>Models</b><span class="s">Open weights, agent safety</span></button></li>
+    <li><button role="tab" id="tab-apps" aria-controls="panel" aria-selected="false" data-layer="apps"><span class="n">Layer 5</span><b>Applications</b><span class="s">State laws, preemption, sector adoption</span></button></li>
+  </ul>
+
+  <div class="panel" id="panel" role="tabpanel" aria-live="polite">
+    <div class="panel-head"><h3 id="p-title"></h3><span class="label" id="p-sub"></span></div>
+    <div class="cols">
+      <div><h4>Live questions this layer is carrying</h4><ul id="p-questions"></ul></div>
+      <div><h4>What's on the record</h4><ul id="p-positions"></ul><div id="p-none" class="none" hidden></div></div>
+    </div>
+    <div class="outs">
+      <div><h4>Staffer brief <span id="p-wc"></span></h4><div class="doc" id="p-brief"></div></div>
+      <div><h4>One-pager skeleton</h4><div class="doc" id="p-onepager"></div></div>
+      <div><h4>LinkedIn draft <button class="copy" id="p-copy" type="button">Copy</button></h4><div class="doc post" id="p-post"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <h2>How the content gets made</h2>
+  <p class="intro">This is a slimmed version of a seven-agent system I run in my day job for executive engagements, pointed at policy sources instead of meeting requests. Four agents do the work. A person makes the decision.</p>
+  <div class="pipe">
+    <div class="node"><span class="label">01 · Monitor</span><b>Watch the primary sources</b><p>Federal Register and BIS rules, congress.gov bill actions, FERC dockets, state legislature feeds, and the company's own blog and SEC filings. Nothing from secondary press enters as a fact.</p></div>
+    <div class="node"><span class="label">02 · Classify</span><b>Put it on a layer</b><p>Each item is tagged with one of the five layers and a type: legislative, regulatory, or geopolitical. Ambiguous items go to a person, not to a coin flip.</p></div>
+    <div class="node"><span class="label">03 · Draft</span><b>Write the three formats</b><p>Brief, one-pager, LinkedIn post. The drafter is given only the company's published materials on that layer and a style guide; it is not allowed to extend a position.</p></div>
+    <div class="node gate"><span class="label">04 · Source-check</span><b>Every claim gets a link or the draft stops</b><p>A second agent reads the draft cold and attaches a primary source to each factual sentence. Any sentence it can't source is flagged, and a flagged draft cannot move forward.</p></div>
+    <div class="node human"><span class="label">05 · Human</span><b>Approve, edit, or kill</b><p>The only publish action in the system is a person's. The log records what was changed and why, so the drafter's prompt improves over time.</p></div>
+  </div>
+
+  <div class="two">
+    <div>
+      <h3>What the pipeline will never publish on its own</h3>
+      <ul class="rules">
+        <li><span class="k">RULE 1</span><span>Anything that states or implies the company's position on a pending bill or rule, unless a published document says it in those words.</span></li>
+        <li><span class="k">RULE 2</span><span>Anything touching export controls, China, or tariffs. These drafts are produced for a person to read, never queued.</span></li>
+        <li><span class="k">RULE 3</span><span>Anything quoting an executive. Quotes are pasted from the source by a person, with the link.</span></li>
+        <li><span class="k">RULE 4</span><span>Any number that doesn't trace to a primary document. "Up to $500 billion" is allowed because the company's own blog says it; a figure from a news summary is not.</span></li>
+        <li><span class="k">RULE 5</span><span>Anything that reads as a response to a breaking story. Rapid response is a communications decision, not a content-generation one.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Sample run log</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Item</th><th>Layer</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td class="m">Oct 16</td><td>Microsoft–NVIDIA joint paper on open-weight model risk</td><td>Models</td><td><span class="pill ok">Approved</span></td></tr>
+          <tr><td class="m">Oct 14</td><td>Policy Marketing Manager posting goes live</td><td>—</td><td><span class="pill hold">Not content</span></td></tr>
+          <tr><td class="m">Oct 8</td><td>NVIDIA joins Alliance for America's Skilled Trades</td><td>Infra</td><td><span class="pill edit">Edited: cut jobs figure not in primary</span></td></tr>
+          <tr><td class="m">Sep 30</td><td>Open Agent Safety Platform (OpenShell + Sentry)</td><td>Models</td><td><span class="pill ok">Approved</span></td></tr>
+          <tr><td class="m">Sep 23</td><td>AI Energy Management Alliance launch</td><td>Energy</td><td><span class="pill ok">Approved</span></td></tr>
+          <tr><td class="m">Sep 18</td><td>Secondary report on H200 license volumes</td><td>Chips</td><td><span class="pill hold">Held: Rule 2, Rule 4</span></td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">Dates are when the item entered the desk, not when the underlying document was published.</p>
+    </div>
+  </div>
+</section>
+
+<section id="gtc">
+  <h2>Applied: a policymaker campaign kit for GTC Washington, D.C.</h2>
+  <p class="intro">GTC returns to the Ronald Reagan Building from November 30 to December 3, 2026, with a keynote on December 1 and a program built around AI and American economic growth. A new policy marketing hire would be living inside this event from day one. Here is how I would run the policymaker track, as a mock plan.</p>
+
+  <div class="tabs" role="tablist" aria-label="Campaign kit">
+    <button role="tab" aria-selected="true" aria-controls="kit-cal" id="kt-cal">3-week calendar</button>
+    <button role="tab" aria-selected="false" aria-controls="kit-one" id="kt-one">Staffer one-pager</button>
+    <button role="tab" aria-selected="false" aria-controls="kit-paid" id="kt-paid">Paid test plan</button>
+    <button role="tab" aria-selected="false" aria-controls="kit-kpi" id="kt-kpi">On-site &amp; KPIs</button>
+  </div>
+
+  <div class="tabpanel" id="kit-cal" role="tabpanel">
+    <div class="kit-grid">
+      <div class="wk"><span class="label">Week of November 9</span><b>Set the frame</b><ul><li>LinkedIn: the five-layer map as a carousel, one slide per layer, each ending on a question the D.C. program will answer.</li><li>Brief to Government Affairs: which Members and committee staff have engaged on which layer since January.</li><li>Invite copy for the government pass, tested in two versions: "economic growth" vs. "scientific discovery" lead.</li></ul></div>
+      <div class="wk"><span class="label">Week of November 16</span><b>Give them a reason to come</b><ul><li>Three partner spotlights (an OEM, a cloud provider, a system integrator) tied to the Infrastructure layer: where the build is happening, in which states.</li><li>Energy explainer: what "flexible data center" means in plain English, with the AEMA paper as the source.</li><li>Session guide for staffers: which five sessions matter if you only have an afternoon.</li></ul></div>
+      <div class="wk"><span class="label">Week of November 23 → event</span><b>Make it easy on site</b><ul><li>Printed one-pager per layer at the government-pass desk; same content as a mobile page.</li><li>Day-of LinkedIn: one post per keynote theme, pre-cleared with Communications and Legal, with a hold rule for anything on export controls.</li><li>Post-event: 48-hour recap for Government Affairs and a 2-week follow-up series on the two layers with the most staffer questions.</li></ul></div>
+    </div>
+  </div>
+
+  <div class="tabpanel" id="kit-one" role="tabpanel" hidden>
+    <div class="doc" style="max-width:46rem">
+      <div class="t">GTC Washington, D.C.: what's in it for your office</div>
+      <p><b>If you cover energy:</b> flexible AI data centers that can shed load when the grid is strained, and the FERC large-load interconnection actions the company has publicly supported.</p>
+      <p><b>If you cover trade or national security:</b> the "Build in America" supply chain, with partners in 43 states and up to $500 billion of U.S.-made AI infrastructure planned.</p>
+      <p><b>If you cover jobs and workforce:</b> the skilled-trades buildout, and the company's membership in the Alliance for America's Skilled Trades.</p>
+      <p><b>If you cover science or health:</b> open-source tools in use at Children's Hospital of Philadelphia, and the NSF AI hub program.</p>
+      <p><b>If you cover AI safety:</b> the Open Agent Safety Platform, an open ecosystem for keeping AI agents inside enforceable limits.</p>
+      <div class="fn">One page, five audiences, every line linked to a published source on the mobile version. No position stated on any pending bill.</div>
+    </div>
+  </div>
+
+  <div class="tabpanel" id="kit-paid" role="tabpanel" hidden>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Test</th><th>Audience</th><th>Creative</th><th>Decision rule</th></tr></thead>
+      <tbody>
+        <tr><td>A: lead with growth</td><td>LinkedIn, D.C. metro, job titles in legislative, policy, government affairs; think-tank and trade-association staff</td><td>"AI is the next industrial buildout." Five-layer carousel</td><td>Winner by cost per government-pass registration, not by clicks</td></tr>
+        <tr><td>B: lead with the local story</td><td>Same, plus state-level audiences in the 43 supplier states</td><td>"Where it's being built." Map creative, one state per frame</td><td>Keep B's states-with-lift for a post-event state series</td></tr>
+        <tr><td>C: lead with safety and trust</td><td>Same, narrowed to AI-policy and tech-governance titles</td><td>"Capable and trusted." Open Agent Safety Platform</td><td>Measure saves and shares, not registrations; this is reputation, not conversion</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Budget split 50/30/20. Every creative goes through Communications and Legal before launch, and the pipeline's hold rules apply to paid copy exactly as they do to organic.</p>
+  </div>
+
+  <div class="tabpanel" id="kit-kpi" role="tabpanel" hidden>
+    <div class="two" style="margin-top:0">
+      <div>
+        <h3>On-site checklist</h3>
+        <ul class="rules">
+          <li><span class="k">T-7</span><span>One-pagers printed, QR to mobile page tested, session guide loaded on the government-pass desk tablets.</span></li>
+          <li><span class="k">T-1</span><span>Day-of social cleared; hold list circulated to everyone with posting rights.</span></li>
+          <li><span class="k">DAY</span><span>Staffer questions captured by layer on one shared sheet; the two most common layers decide the follow-up series.</span></li>
+          <li><span class="k">T+2</span><span>Recap to Government Affairs: who came, what they asked, what we couldn't answer.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>What I'd measure</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Metric</th><th>Why this one</th></tr></thead>
+          <tbody>
+            <tr><td>Government-pass registrations by office type</td><td>The only number that proves the event reached its audience</td></tr>
+            <tr><td>Staffer questions per layer</td><td>Tells you what to write next, which is the real output of an event</td></tr>
+            <tr><td>Primary-source click-through on the mobile one-pager</td><td>If they open the FERC post, the explainer did its job</td></tr>
+            <tr><td>Share of posts held vs. published</td><td>A healthy policy desk holds things. Zero holds means the rules aren't being applied</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scope">
+  <h2>What I chose not to build, and why</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omission</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Any inferred position</td><td>Where the company has not published a view (federal preemption of state AI laws is the clearest case), the desk says "no published position" and stops. A policy desk that guesses is worse than no desk.</td></tr>
+      <tr><td>Rapid response</td><td>The pipeline runs on a daily batch. Responding to a story in the hour is a judgment call for Communications, not a feature.</td></tr>
+      <tr><td>Logos, brand assets, or the company's voice</td><td>This is independent work. The drafts borrow the plain, confident register of the company's public blog, nothing more.</td></tr>
+      <tr><td>A content audit of existing materials</td><td>I did one. It is more useful as a conversation than as a public page.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 style="margin-top:44px">What I'd build next</h2>
+  <ul style="max-width:44rem;padding-left:1.1rem">
+    <li><b>State view.</b> The same desk filtered by state: supplier sites, data-center projects, pending state bills, and a one-pager per delegation. The 43-state story is the most under-used asset in the public materials.</li>
+    <li><b>International layer.</b> The same five layers for the UK, EU and Japan, where the company runs ecosystem events and the policy questions are different (sovereign AI, the AI Act, energy pricing).</li>
+    <li><b>Staffer-question loop.</b> Feed questions captured at events back into the monitor, so the desk tracks what Washington is asking, not only what agencies are publishing.</li>
+    <li><b>Open-model drafter.</b> Run the drafting agent on an open-weight model so the desk practices what the Models layer preaches.</li>
+  </ul>
+</section>
+
+<section id="sources">
+  <h2>Sources</h2>
+  <p class="intro">Every claim on this page traces to one of these. Where a figure came from a secondary report, the desk held it and it does not appear here.</p>
+  <ol class="srcs">
+    <li><a href="https://blogs.nvidia.com/blog/ai-5-layer-cake/">AI Is a 5-Layer Cake</a>, NVIDIA Blog, March 10, 2026</li>
+    <li><a href="https://blogs.nvidia.com/blog/nvidia-and-partners-build-in-america-for-america/">NVIDIA and Partners Build in America, for America</a>, NVIDIA Blog, updated August 5, 2026</li>
+    <li><a href="https://blogs.nvidia.com/blog/ferc-large-load-interconnection/">How FERC's Large-Load Interconnection Actions Help Address Grid Stress, Improve Affordability</a>, NVIDIA Blog, June 18, 2026</li>
+    <li><a href="https://blogs.nvidia.com/blog/ai-energy-management-alliance/">NVIDIA, Emerald AI and Google launch the AI Energy Management Alliance</a>, NVIDIA Blog, September 2026</li>
+    <li><a href="https://blogs.nvidia.com/blog/ai-future-open-and-proprietary/">The Future of AI Is Open and Proprietary</a>, NVIDIA Blog, March 25, 2026</li>
+    <li><a href="https://www.cnbc.com/2026/07/24/nvidia-microsoft-meta-open-weight-ai-models.html">Open-weights letter coverage</a>, CNBC, July 24, 2026</li>
+    <li><a href="https://blogs.nvidia.com/blog/open-secure-ai-alliance/">Open Secure AI Alliance</a>, NVIDIA Blog, July 27, 2026</li>
+    <li><a href="https://www.microsoft.com/en-us/security/blog/">Managing open-weight model risk in enterprise deployments</a>, Microsoft Security Blog with NVIDIA, October 2026</li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000075/nvda-20260726.htm">NVIDIA Form 10-Q for the quarter ended July 26, 2026</a>, SEC</li>
+    <li><a href="https://www.congress.gov/bill/119th-congress/house-bill/6875">H.R. 6875, AI OVERWATCH Act</a>, congress.gov</li>
+    <li><a href="https://www.nvidia.com/gtc/dc/">GTC Washington, D.C., November 30–December 3, 2026</a>, NVIDIA</li>
+    <li><a href="https://www.nvidia.com/en-us/industries/public-sector/government-affairs/">Making an Impact with AI for Public Policy</a>, NVIDIA</li>
+    <li><a href="https://www.whitehouse.gov/">Executive Order 14365 (December 11, 2025) and the National AI Legislative Framework (March 20, 2026)</a>, White House</li>
+    <li><a href="https://blogs.nvidia.com/blog/">NVIDIA joins the Alliance for America's Skilled Trades</a>, NVIDIA, October 2026</li>
+  </ol>
+</section>
+
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani · independent work, not affiliated with NVIDIA or any employer</span><a href="../../">Back to home</a></div></div>
+
+<script>
+const LAYERS = {
+energy: {
+  title: "Energy", sub: "Layer 1 · Regulatory · FERC, utilities, state PUCs",
+  questions: [
+    "How should large loads such as AI data centers connect to the grid, and who pays for the upgrades? (FERC large-load interconnection actions, 2026)",
+    "Can data centers be counted as flexible grid assets that reduce demand when the system is strained, and how is that flexibility verified?",
+    "Will AI buildout raise residential electricity rates, and what evidence do utilities have either way?",
+    "State-level utility tariffs and moratorium proposals aimed specifically at data-center load."
+  ],
+  positions: [
+    ["Supports FERC's large-load interconnection actions as a way to reduce grid stress and improve affordability.", "NVIDIA Blog, June 18, 2026"],
+    ["Co-founded the AI Energy Management Alliance with Emerald AI and Google to make data centers responsive to grid conditions, working with utilities, grid operators and policymakers on technology-neutral, performance-based approaches.", "NVIDIA Blog, September 2026"],
+    ["Frames flexible AI infrastructure as something that works with the grid rather than only drawing from it.", "AEMA launch materials"]
+  ],
+  none: null,
+  brief: "<p><b>The question your office will get:</b> does AI make electricity more expensive for my constituents?</p><p><b>The short answer from the public record:</b> it depends on how the data center connects. A data center that must run at full draw at all times forces the utility to build for the peak. One that can shift work, draw on stored energy or cut demand when the grid is strained uses capacity that already exists. The company's June post supports FERC's large-load actions on those grounds, and in September it co-founded an alliance with Emerald AI and Google to standardize how that flexibility is measured and rewarded.</p><p><b>What to ask a utility witness:</b> whether their tariff recognizes verifiable flexibility, and what share of new large loads have signed up for it.</p>",
+  onepager: "<div class='t'>AI infrastructure that works with the grid</div><ul><li><b>The problem:</b> peak-sized interconnection for loads that don't need to run at peak.</li><li><b>The approach on the record:</b> flexible data centers, FERC large-load reform, performance-based tariffs.</li><li><b>Who else is saying it:</b> the alliance's utility and grid-operator members, and the company's own clean-energy customer stories.</li></ul><div class='vals'><span>Emerald AI</span><span>Google</span><span>Utility partners</span><span>Grid operators</span></div><div class='fn'>Every bullet links to the June FERC post or the AEMA paper.</div>",
+  post: "Energy is the first layer of the AI stack, and it's the one policymakers hear about most.\n\nTwo things on the public record worth knowing:\n\n1. FERC's large-load interconnection actions get support from the company because they address grid stress and affordability together, not one at the expense of the other.\n\n2. The AI Energy Management Alliance (with Emerald AI and Google) is building a standard for data centers that reduce demand when the grid is strained.\n\nThe question isn't whether AI uses power. It's whether the infrastructure is built to flex. Links in the comments."
+},
+chips: {
+  title: "Chips", sub: "Layer 2 · Geopolitical · BIS, Congress, USTR",
+  questions: [
+    "Case-by-case export licensing of advanced accelerators to China after the January 2026 BIS rule, and the conditions attached.",
+    "Pending legislation: the GAIN AI Act (Senate NDAA, October 2025), the AI OVERWATCH Act (H.R. 6875, reported by House Foreign Affairs January 21, 2026) and the Remote Access Security Act.",
+    "Proposed chip-security mandates: location verification and remote throttling of exported hardware.",
+    "Tariffs on semiconductors and the economics of U.S. assembly."
+  ],
+  positions: [
+    ["Plans with partners for up to $500 billion of AI infrastructure built in the United States, with a supplier network across 43 states.", "NVIDIA Blog, Build in America, updated August 5, 2026"],
+    ["Warns in SEC filings that mandated chip tracking and throttling mechanisms could introduce system vulnerabilities.", "Form 10-Q, quarter ended July 26, 2026"],
+    ["Reports that as of the July 2026 quarter it had not generated revenue under the H200 licensing program.", "Form 10-Q, quarter ended July 26, 2026"]
+  ],
+  none: "<b>Held by Rule 2.</b> Drafts on this layer are produced for a person to read and are never queued for publishing. The outputs below are shown to demonstrate the format only.",
+  brief: "<p><b>The question your office will get:</b> is the company selling our best chips to China?</p><p><b>The short answer from the public record:</b> licensing moved to case-by-case review in January 2026, and the company's own quarterly filing says it had recorded no revenue under the H200 program as of July. The larger story in the public materials is domestic: a supplier network in 43 states and up to $500 billion of U.S.-built AI infrastructure.</p><p><b>On chip-security mandates:</b> the filing's language is specific. Tracking and throttling mechanisms \"could introduce system vulnerabilities.\" That is the on-record line; anything beyond it should come from Government Affairs, not from a brief.</p>",
+  onepager: "<div class='t'>Built in America, for America</div><ul><li><b>Where:</b> partner sites in Texas, Arizona and across a 43-state supplier network.</li><li><b>How much:</b> up to $500 billion of U.S.-made AI infrastructure planned with partners.</li><li><b>Who builds it:</b> the OEMs, foundries and component makers named in the company's own buildout post.</li></ul><div class='vals'><span>Foxconn</span><span>Wistron</span><span>Corning</span><span>Coherent</span></div><div class='fn'>Export-control content is deliberately absent from the one-pager. It belongs in a conversation.</div>",
+  post: "[HELD. Rule 2: export controls. This draft is for internal reading only.]\n\nWhat the public record says about chips and Washington this year:\n\n• A 43-state supplier network and up to $500B of U.S.-built AI infrastructure planned with partners.\n• A quarterly filing that is unusually direct about chip-security mandates: tracking and throttling \"could introduce system vulnerabilities.\"\n\nI'd rather talk about the first bullet. The second is why the hold rule exists."
+},
+infra: {
+  title: "Infrastructure", sub: "Layer 3 · Legislative and state · Siting, permitting, workforce",
+  questions: [
+    "Permitting and siting for AI factories: federal streamlining proposals vs. local control.",
+    "State data-center incentives and the backlash over water, land and tax abatements.",
+    "The skilled-trades gap: the Alliance for America's Skilled Trades estimates 1.7 million openings a year through 2035.",
+    "Whether the AI buildout is counted as reindustrialization in the economic data members see."
+  ],
+  positions: [
+    ["Describes AI factories as a new industrial base, built with partners in the United States, and keeps a running public log of sites, suppliers and jobs.", "NVIDIA Blog, Build in America"],
+    ["Joined the Alliance for America's Skilled Trades in October 2026, citing the workforce needed for the buildout.", "NVIDIA, October 2026"],
+    ["Participates in the NSF State and Regional AI Hubs program.", "NVIDIA public-sector materials"]
+  ],
+  none: null,
+  brief: "<p><b>The question your office will get:</b> what does an AI factory mean for jobs in my district?</p><p><b>The short answer from the public record:</b> two kinds of work. The first is construction and the trades: electricians, pipefitters, HVAC. The Alliance for America's Skilled Trades, which the company joined in October, puts the national need at 1.7 million openings a year through 2035. The second is the supplier base: the company's buildout post names partner sites and a supplier network in 43 states, which is the number most useful to a Member because it can be made local.</p><p><b>What to ask:</b> which suppliers are in the district, and whether the local community college has an apprenticeship pipeline tied to the project.</p>",
+  onepager: "<div class='t'>The buildout, by the people who build it</div><ul><li><b>The trades:</b> 1.7M openings a year through 2035 (Alliance report).</li><li><b>The suppliers:</b> 43 states in the public supplier network.</li><li><b>The partners:</b> OEMs, cloud providers and system integrators building sites now.</li></ul><div class='vals'><span>Alliance for America's Skilled Trades</span><span>Jobs for the Future</span><span>Community colleges</span></div><div class='fn'>State and district cut available on request from the pipeline's state view (not yet built).</div>",
+  post: "The third layer of the AI stack is the one you can drive past.\n\nAI factories are being built by electricians, pipefitters and HVAC techs, and the Alliance for America's Skilled Trades estimates 1.7 million trades openings a year through 2035. The company joined the Alliance this month.\n\nIf you work for a Member and want to know what the buildout means at home, the useful number is this: the public supplier network spans 43 states. Ask which ones are yours."
+},
+models: {
+  title: "Models", sub: "Layer 4 · Legislative and standards · Open weights, agent safety",
+  questions: [
+    "Proposals to restrict open-weight models, including models of Chinese origin, and what that would do to U.S. research and defense capacity.",
+    "How enterprises should assess the risk of an open-weight model: weights alone, or capabilities, provenance, deployment and safeguards together.",
+    "Whether AI agents can be given enforceable limits, and who verifies them.",
+    "Distillation and model provenance as a trade and security issue."
+  ],
+  positions: [
+    ["Argues the world needs both frontier closed models and frontier open models, and that blanket restrictions on open frontier systems would weaken defensive capacity.", "NVIDIA Blog, March 25, 2026; open-weights letter, July 24, 2026"],
+    ["Organized an open-weights letter signed by 25 companies at launch, and co-launched the Open Secure AI Alliance on July 27, 2026.", "CNBC, July 24, 2026; NVIDIA Blog, July 27, 2026"],
+    ["Introduced the Open Agent Safety Platform (OpenShell and Sentry) with more than 100 partners, as an open ecosystem for keeping agents inside enforceable boundaries.", "NVIDIA, September 2026"],
+    ["Published a joint paper with Microsoft on managing open-weight model risk in enterprise deployments, the first in a planned series.", "Microsoft Security Blog, October 2026"]
+  ],
+  none: null,
+  brief: "<p><b>The question your office will get:</b> aren't open models just a gift to adversaries?</p><p><b>The short answer from the public record:</b> the company's position is that open and closed frontier models both matter, that open tooling is a defensive asset, and that a model's risk is not set by its weights alone. The October joint paper with Microsoft makes that last point operational: it gives enterprises a shared risk taxonomy that looks at capabilities, provenance, deployment and safeguards together.</p><p><b>On agents:</b> the September Open Agent Safety Platform is the concrete answer to \"can agents be limited.\" It is open, it has more than 100 partners, and its pitch is that trust is how capable AI gets adopted at all.</p>",
+  onepager: "<div class='t'>Capable and trusted: the case for open models</div><ul><li><b>The claim:</b> risk depends on how a model is deployed, not only on whether its weights are public.</li><li><b>The proof:</b> a joint Microsoft–NVIDIA risk framework, an open agent-safety platform with 100+ partners, a 25-company letter.</li><li><b>The ask:</b> judge deployments, not weights.</li></ul><div class='vals'><span>Microsoft</span><span>Meta</span><span>IBM</span><span>Dell</span><span>Hugging Face</span></div><div class='fn'>Validators are the letter's named signers; the list is reproduced from public coverage.</div>",
+  post: "\"Open or closed\" is the wrong question about AI model risk.\n\nThis month Microsoft and NVIDIA published a joint paper that says so plainly: a model's risk depends on capabilities, provenance, deployment, permissions and safeguards, not on weights alone.\n\nIt lands two weeks after the Open Agent Safety Platform, an open ecosystem (100+ partners) for giving AI agents limits that hold while they work.\n\nTrust is how capable AI gets adopted. The open ecosystem is where the trust layer is being built."
+},
+apps: {
+  title: "Applications", sub: "Layer 5 · Legislative · State AI laws, preemption, sector adoption",
+  questions: [
+    "Federal preemption of state AI laws, after Executive Order 14365 (December 11, 2025) and the White House legislative framework of March 20, 2026.",
+    "Sector adoption: health care, public safety, scientific discovery, climate.",
+    "AI and employment: which jobs are created, which are displaced, and what the data shows so far.",
+    "AI literacy for policymakers and the public."
+  ],
+  positions: [
+    ["Holds that applications are the layer where economic value is created, and has argued publicly for sensible regulation that keeps the application layer open to builders.", "AI Is a 5-Layer Cake, March 10, 2026; CEO public remarks, 2026"],
+    ["Points to open-source NVIDIA tools in clinical use, including cardiac modeling at Children's Hospital of Philadelphia.", "NVIDIA Blog, September 2026"],
+    ["Joined The Earthshot Prize as a Global Alliance founding partner, supporting finalists with compute and engineering help.", "The Earthshot Prize, October 2026"]
+  ],
+  none: "<b>No published position found on federal preemption of state AI laws.</b> The desk does not infer one. Content on this question is routed to Government Affairs and Legal before anything is drafted.",
+  brief: "<p><b>The question your office will get:</b> should Congress preempt our state's AI law?</p><p><b>The short answer from the public record:</b> the company has not published a position on preemption, and this desk will not guess at one. What it has said is where it thinks value sits: in applications, the layer where a hospital, a utility or a lab puts AI to work. The strongest public examples are in health care (open-source cardiac modeling at CHOP) and in climate science (the Earthshot partnership).</p><p><b>Useful reframe for a staffer:</b> most of the application-layer stories are about a specific institution in a specific state. Ask which ones are in yours.</p>",
+  onepager: "<div class='t'>Where the value shows up</div><ul><li><b>Health:</b> hours of manual cardiac modeling to seconds, on open-source tools.</li><li><b>Climate:</b> compute and engineering support for Earthshot finalists.</li><li><b>Science:</b> NSF AI hubs and the GTC D.C. program on U.S. discovery.</li></ul><div class='vals'><span>Children's Hospital of Philadelphia</span><span>The Earthshot Prize</span><span>NSF</span></div><div class='fn'>Preemption deliberately absent. See the hold note above.</div>",
+  post: "The top layer of the AI stack is the one people actually touch.\n\nAt Children's Hospital of Philadelphia, open-source tools turn a child's existing scans into a model of their heart in seconds, so surgeons can plan before they operate.\n\nThat's an application. It's where the value of the four layers underneath it shows up, and it's the layer most policy conversations should start from."
+}
+};
+
+const $ = id => document.getElementById(id);
+function render(key){
+  const L = LAYERS[key];
+  $('p-title').textContent = L.title;
+  $('p-sub').textContent = L.sub;
+  $('p-questions').innerHTML = L.questions.map(q => `<li>${q}</li>`).join('');
+  $('p-positions').innerHTML = L.positions.map(p => `<li>${p[0]}<br><span class="src">${p[1]}</span></li>`).join('');
+  const n = $('p-none'); if (L.none){ n.innerHTML = L.none; n.hidden = false; } else { n.hidden = true; }
+  $('p-brief').innerHTML = L.brief;
+  $('p-wc').textContent = $('p-brief').textContent.trim().split(/\s+/).length + ' words';
+  $('p-onepager').innerHTML = L.onepager;
+  $('p-post').textContent = L.post;
+  document.querySelectorAll('.stack [role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.layer === key)));
+  try { localStorage.setItem('desk-layer', key); } catch(e){}
+}
+document.querySelectorAll('.stack [role=tab]').forEach(b => b.addEventListener('click', () => render(b.dataset.layer)));
+let start = 'energy';
+try { const h = location.hash.replace('#',''); if (LAYERS[h]) start = h; else { const s = localStorage.getItem('desk-layer'); if (LAYERS[s]) start = s; } } catch(e){}
+render(start);
+
+$('p-copy').addEventListener('click', () => {
+  const t = $('p-post').textContent, btn = $('p-copy');
+  const done = () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(() => { selectEl($('p-post')); });
+  else selectEl($('p-post'));
+});
+function selectEl(el){ const r = document.createRange(); r.selectNodeContents(el); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+document.querySelectorAll('.tabs [role=tab]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs [role=tab]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  document.querySelectorAll('.tabpanel').forEach(p => p.hidden = (p.id !== b.getAttribute('aria-controls')));
+}));
+</script>
+</body>
+</html>
