@@ -18,36 +18,34 @@
       <span class="label">Open-source eval · Code</span>
       <h1>Briefing evals: does the AI make things up?</h1>
       <p>A small test suite for the failure I worry about most in AI-drafted briefings: a confident guess where the source was silent.</p>
-      <div class="meta"><span>Type <b>Independent work</b></span><span>Language <b>Python, no dependencies</b></span><span>Cases <b>12, all fictional</b></span><span><a href="https://github.com/AOSMANI123/Aosmani123.github.io/tree/main/projects/briefing-evals" target="_blank" rel="noopener" style="color:var(--marigold)">View the code</a></span></div>
+      <div class="meta"><span>Type <b>Independent work</b></span><span>Language <b>Python, no dependencies</b></span><span>Cases <b>50, all fictional</b></span><span>Version <b>v2, October 31, 2026</b></span><span><a href="https://github.com/AOSMANI123/briefing-evals" target="_blank" rel="noopener" style="color:var(--marigold)">View the code</a></span></div>
     </header>
   </div>
 </div>
 
 <main class="wrap">
-  <div class="tldr"><p><b>Short version.</b> I build systems that draft executive briefings. In a briefing, a guess is worse than a blank. This suite gives a drafter twelve fictional engagement requests, each with one trap, and scores two things: did it pull out what was there, and did it fill in what wasn't?</p></div>
+  <div class="tldr"><p><b>Short version.</b> I build systems that draft executive briefings. In a briefing, a guess is worse than a blank. This suite gives a drafter 50 fictional engagement requests, each with a trap, and scores two things: did it pull out what was there, and did it fill in what wasn't? v2 turns it from a prompt test into a model-readiness test: repeated runs, a pass gate calibrated to measured noise, a side-by-side across model providers, and a check on the answer key itself.</p></div>
 
   <h2>Why this matters</h2>
   <p>A briefing drafter that's right 95% of the time sounds great until you ask what the other 5% looks like. If it leaves a field blank, someone fills it in. If it invents a moderator's name or carries last year's date forward, that error can reach an executive's prep with no warning. The second failure is the one to measure.</p>
 
   <h2>The traps</h2>
+  <p>v1 had twelve cases with one trap each. v2 has 50 in ten categories, so no single case decides a result.</p>
   <div class="table-wrap"><table>
-    <thead><tr><th>Case</th><th>Trap</th><th>Right answer</th></tr></thead>
+    <thead><tr><th>Category</th><th>Cases</th><th>Example</th><th>Right answer</th></tr></thead>
     <tbody>
-      <tr><td>No moderator</td><td>Nobody is named as moderator</td><td><code>UNKNOWN</code></td></tr>
-      <tr><td>Vague crowd</td><td>"Always draws a big crowd"</td><td>Audience size <code>UNKNOWN</code>, no number</td></tr>
-      <tr><td>Last year's date</td><td>Only last year's date appears; this year's isn't set</td><td>Date <code>UNKNOWN</code></td></tr>
-      <tr><td>Forwarded</td><td>A colleague forwarded the request</td><td>The original sender, not the forwarder</td></tr>
-      <tr><td>Virtual</td><td>Online event; last year's viewership mentioned</td><td>Location "virtual," audience <code>UNKNOWN</code></td></tr>
-      <tr><td>Two events</td><td>One event is mentioned only to rule it out</td><td>The event actually being asked about</td></tr>
-      <tr><td>Range</td><td>"250-300 people"</td><td>The range, not an average</td></tr>
-      <tr><td>Open format</td><td>"Flexible on what that looks like"</td><td>Format <code>UNKNOWN</code></td></tr>
-      <tr><td>Complete</td><td>Everything is stated (control)</td><td>All nine fields</td></tr>
-      <tr><td>TBD moderator</td><td>"Moderator: TBD"</td><td><code>UNKNOWN</code></td></tr>
-      <tr><td>No signature</td><td>Signed only by "events team"</td><td>Requestor name <code>UNKNOWN</code></td></tr>
-      <tr><td>Pending venue</td><td>City known, venue pending</td><td>The city only</td></tr>
+      <tr><td>Role confusion</td><td class="num">7</td><td>The founder will introduce the CEO's keynote</td><td>Moderator <code>UNKNOWN</code>: an introducer isn't a moderator</td></tr>
+      <tr><td>Stale information</td><td class="num">7</td><td>Last year's event drew 3,000 people</td><td>Audience <code>UNKNOWN</code>, not 3,000</td></tr>
+      <tr><td>Attribution</td><td class="num">7</td><td>Forwarded twice, through an agency</td><td>The original sender</td></tr>
+      <tr><td>Missing field</td><td class="num">6</td><td>An in-person panel with no city</td><td>Location <code>UNKNOWN</code></td></tr>
+      <tr><td>Pending</td><td class="num">5</td><td>"Choosing between two journalists"</td><td>Moderator <code>UNKNOWN</code>, neither name</td></tr>
+      <tr><td>Distractor event</td><td class="num">4</td><td>An already-declined investor day is mentioned</td><td>The event actually being asked about</td></tr>
+      <tr><td>Precision</td><td class="num">4</td><td>A 20-minute keynote and a 10-minute Q&amp;A</td><td>Copied as written, not added up</td></tr>
+      <tr><td>Vague quantity</td><td class="num">4</td><td>"The hall seats 2,000"</td><td>Audience <code>UNKNOWN</code>: capacity isn't attendance</td></tr>
+      <tr><td>Correction</td><td class="num">3</td><td>"Update: the date has moved to May 13"</td><td>The new date</td></tr>
+      <tr><td>Control</td><td class="num">3</td><td>Everything is stated</td><td>All nine fields</td></tr>
     </tbody>
   </table></div>
-
   <h2>How it's scored</h2>
   <p>The drafter returns JSON with nine fields. Each field is scored as correct, missed (said <code>UNKNOWN</code> when the answer was there), wrong, or fabricated (filled in when the source was silent). The scorer also flags any number in the output that doesn't appear in the source.</p>
   <div class="table-wrap"><table>
@@ -55,6 +53,7 @@
     <tbody>
       <tr><td>Recall on known fields</td><td>Did it pull out what was actually there?</td></tr>
       <tr><td>Fabrication rate</td><td>Of the fields that were missing, how many did it fill in anyway?</td></tr>
+      <tr><td>Carried-over values <span class="pill yes">v2</span></td><td>Did a fact about a different event, year or person end up in this briefing?</td></tr>
     </tbody>
   </table></div>
 
@@ -62,8 +61,8 @@
   <p>Same cases, two prompts. The naive one says "fill in the briefing details." The other states the rules I actually use: only this event, <code>UNKNOWN</code> when it isn't stated, the forwarder isn't the requestor, copy numbers as written.</p>
   <p><span class="pill hyp">Hypothesis</span> The naive prompt fills in missing fields. Explicit rules bring fabrication close to zero without hurting recall.</p>
 
-  <h2>Results so far</h2>
-  <p>First real-model run: October 7, 2026, <code>claude-sonnet-5</code>, one run per prompt.</p>
+  <h2>v1 results</h2>
+  <p>First real-model run: October 7, 2026, <code>claude-sonnet-5</code>, twelve cases, one run per prompt. Scored against the v1 answer key, so not directly comparable to v2.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Drafter</th><th>Recall</th><th>Fabrication (as scored)</th><th>Status</th></tr></thead>
     <tbody>
@@ -90,27 +89,56 @@
   <p><span class="pill hyp">Hypothesis check</span> Partly confirmed. The rules prompt fixed two of the three real problems. The Priya Nand case survived both prompts, which points at the schema (there's no "introducer" field) rather than the prompt. And the rules weren't free: the model marked 4 stated fields <code>UNKNOWN</code>. A blank still beats a guess in an executive briefing, but it's a trade-off to measure, not assume.</p>
   <p>The honest fabrication count for the naive prompt is closer to 3 of 12 than 10 of 12. The mocks proved the scorer works mechanically. The real run showed that working mechanically and measuring the right thing are different claims.</p>
 
-  <h2>What I'm changing next</h2>
-  <ul>
-    <li>Accept honest blanks in any wording (<code>Not specified</code>, <code>TBD</code>) so fabrication measures invention, not formatting.</li>
-    <li>Add a check that last year's figures stay out of this year's fields. A copied number can still be the wrong number.</li>
-    <li>Decide case 02's answer key: add an introducer field, or document that an emcee isn't a moderator.</li>
-    <li>Run each prompt several times before trusting a pass gate. These are single runs.</li>
-  </ul>
+  <h2>What v2 changed</h2>
+  <p>Every item on the v1 "next" list is done, and building it turned up one more problem.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>v1 problem</th><th>v2 fix</th></tr></thead>
+    <tbody>
+      <tr><td>"TBD" and "Not specified" were scored as fabrications</td><td>Honest blanks count as blanks in any wording, and are tracked separately as a format-compliance number</td></tr>
+      <tr><td>Last year's 40,000 viewers slipped through</td><td>Each case can name values that belong to a different event, year or person. If one lands in a field, it's flagged as carried over</td></tr>
+      <tr><td>Emcee or moderator?</td><td>One written rule: the moderator leads the conversation or runs the panel. It's in the prompt, so the model is told the rule it's scored on</td></tr>
+      <tr><td><b>New:</b> the v1 answer key contradicted itself</td><td>Case 02 said an introducer isn't a moderator, but two other cases counted an introducer and a keynote host as moderators. Both were fixed</td></tr>
+      <tr><td>Single runs can't support a gate</td><td><code>--runs N</code>, and a gate calibrated to measured noise (below)</td></tr>
+      <tr><td>Only one model provider</td><td>Anthropic, OpenAI and Google drafters, with tokens, latency and cost per run</td></tr>
+    </tbody>
+  </table></div>
 
+  <h2>A gate people will trust</h2>
+  <p>A pass gate that fails unchanged prompts gets turned off. One that misses real regressions is decorative. The v2 gate fails a change only when a metric moves more than run-to-run noise explains, and the allowance shrinks as either side runs more times.</p>
+  <p>I tested it on a simulated drafter before trusting it. The first design got <em>less</em> sensitive with more runs, so I replaced it. The shipped version, with 10 baseline runs:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Candidate</th><th>1 run</th><th>3 runs</th><th>10 runs</th></tr></thead>
+    <tbody>
+      <tr><td>Unchanged (false alarm rate)</td><td class="num">5%</td><td class="num">5%</td><td class="num">2%</td></tr>
+      <tr><td>Fabrication rate up 50%</td><td class="num">18%</td><td class="num">35%</td><td class="num">55%</td></tr>
+      <tr><td>Fabrication rate doubled</td><td class="num">57%</td><td class="num">90%</td><td class="num">100%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Share of 40 trials in which the gate failed the candidate. These numbers come from a simulation, not a model; the harness measures the real false-alarm rate once real runs exist. The setting I'd use: 10 baseline runs, 3 per change.</p>
+
+  <h2>Sorting failures by what would fix them</h2>
+  <p>Comparing two setups sorts every failure into four groups. <b>Fixed by the candidate</b> means the prompt change worked. <b>Persistent</b> means it fails no matter the prompt, so the problem is in the schema, the answer key or the model. <b>Introduced</b> is a regression. <b>Flaky</b> means run more before deciding. In v1, the emcee error persisted under both prompts and turned out to be a definition problem. v2 makes that call from data instead of by hand.</p>
+
+  <h2>Checking the answer key</h2>
+  <p>An eval is only as good as its answer key, and v1's had a contradiction nobody caught. v2 ships a labeling kit: a second person labels a 15-case sample without seeing the key, and the harness reports Cohen's kappa on "stated vs. not stated." The target is above 0.8. An AI review of all 50 keys found no wrong values and 14 edge cases, which are fixed. The human check is next, because a model reviewing a key written with a model's help shares its blind spots.</p>
+
+  <h2>Status</h2>
+  <p><span class="pill">Built and tested offline</span> The cases, scorer, gate and labeling kit work, and 33 tests pass. Real-model runs across providers are next. The results will go into a one-page <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/readiness-memo.md" target="_blank" rel="noopener">readiness memo</a>: which model and prompt to ship, the evidence, and what would change the call.</p>
   <h2>Run it</h2>
 <pre>python3 -m unittest discover -s tests
-python3 evals.py --drafter mock-fabricator
+python3 evals.py --drafter mock-noisy --runs 10 --out runs/sim.json
+python3 evals.py calibrate runs/sim.json
 
-pip install anthropic
-export ANTHROPIC_API_KEY=...
-python3 evals.py --drafter anthropic --prompt prompts/naive.txt
-python3 evals.py --drafter anthropic --prompt prompts/flag_gaps.txt</pre>
+python3 evals.py --drafter anthropic --model &lt;id&gt; --prompt prompts/flag_gaps.txt --runs 10 --out runs/base.json
+python3 evals.py --drafter anthropic --model &lt;id&gt; --prompt prompts/flag_gaps_v2.txt --runs 3 --out runs/cand.json
+python3 evals.py compare runs/base.json runs/cand.json
+python3 evals.py table runs/*.json</pre>
 
   <h2>Limits</h2>
   <ul>
-    <li>Twelve cases is a starting set, not a benchmark. Next is 50+ cases based on patterns from real requests, with every detail rewritten.</li>
-    <li>Matching is simple text containment, so it can't catch an invented venue added next to the correct city.</li>
+    <li>Fabrication coverage leans on one field: 26 of the 49 gaps are the moderator. Event name and ask are never missing. Read fabrication per field before drawing conclusions.</li>
+    <li>All 50 cases were written by one person with AI help. The human labeler check hasn't run yet.</li>
+    <li>Matching is word-level containment, so it can't catch an invented venue added next to the correct city.</li>
     <li>It checks the fact block, not the prose of the briefing.</li>
   </ul>
 </main>

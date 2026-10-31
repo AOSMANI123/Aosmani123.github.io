@@ -1,161 +1,193 @@
 # Briefing Evals
 
-**Golden-set regression testing for LLM-generated briefings.**
+A test harness that checks whether an AI makes up facts when it drafts an executive briefing. It gives a model 50 fictional speaking invitations, each with a deliberate trap, and scores whether the model admits a gap or fills it with a plausible guess.
 
-Independent work. Not affiliated with any employer.
+v2 turns it from a prompt test into a **model-readiness test**: repeated runs, a pass gate calibrated to measured noise, a side-by-side across model providers, failures sorted by what would fix them, and a way to check the answer key against an independent labeler.
 
 ---
 
-## Problem
-
-LLM features are reliability problems. Most teams shipping AI-powered features treat evaluation as an afterthought: they build a demo, eyeball the output, and ship. When a prompt change breaks something, they find out from a user, not a test. Prompt regression testing doesn't exist as a standard practice.
-
-In executive briefings specifically, the failure mode is subtle and dangerous. A drafter that invents a moderator's name, carries forward last year's date, or converts "a big crowd" into "500 attendees" produces output that *looks* correct. The error reaches the executive's prep packet with no warning. A guess is worse than a blank.
-
-## Why now
-
-Every team shipping LLM features needs regression testing but builds it ad hoc. There is no lightweight, open harness that answers the basic question: "did my prompt change break something that was working?" The tooling gap means most teams either don't test at all or build one-off scripts that test the wrong thing (exact string matching against nondeterministic output).
-
 ## What it does
 
-Golden-set regression testing for prompts, focused on factual accuracy in structured extraction tasks.
+- **50 test cases in 10 trap categories:** missing fields, vague quantities ("a packed house"), stale information (last year's date or moderator), pending details, attribution (forwarded twice, a logistics contact, a mutual contact), role confusion (an introducer is not a moderator), distractor events, precision, corrections, and controls.
+- **An answer key** for nine briefing fields per case. `null` means the source doesn't state it for this event. Many cases also list `forbidden` values: things the source says about a different event, year or person.
+- **A scorer** that reports recall, fabrication, wrong values, carried-over values, and numbers that aren't in the source. Honest blanks count as blanks in any wording (`TBD`, `Not specified`).
+- **Repeated runs** with `--runs N`, reported as a mean and range.
+- **A pass gate** that fails a prompt or model change only when a metric moves more than run-to-run noise explains.
+- **Failure grouping** that sorts each failure into prompt-fixable, persistent, introduced, or flaky.
+- **Drafters for three providers** (Anthropic, OpenAI, Google), with token counts, latency and cost.
+- **An agreement kit** that measures the answer key against an independent human labeler (Cohen's kappa).
 
-- **Versioned prompts.** Each prompt is a text file. You can diff two versions and trace when a behavior changed.
-- **Fixture set of inputs with expected properties.** Twelve fictional engagement requests, each with an answer key for nine briefing fields and one deliberate trap (a missing moderator, a forwarded email, a vague audience size).
-- **Assertions that survive nondeterminism.** Three layers:
-  - *Structural:* Does the output parse as valid JSON with the expected fields?
-  - *Containment:* Does the extracted value contain the expected text (normalized)?
-  - *Fabrication detection:* Did the drafter fill in a field the source left blank? Did it introduce numbers not present in the source?
-- **Side-by-side diff of two prompt versions.** Run the same cases against two prompts and compare recall, fabrication rate, wrong values, and invented numbers.
-- **Pass gate that blocks regressions.** A prompt version that increases the fabrication rate or drops recall below a threshold fails the eval. The gate is designed to catch real regressions, not penalize nondeterministic variance.
+---
 
-## How I measure success
+## How it works
 
-| Metric | Target | Why it matters |
+```
+ cases/*.json  (source email + answer key + forbidden values)
+        │
+        ▼
+ drafter (mock, Anthropic, OpenAI or Google) + a prompt  × N runs
+        │
+        ▼
+ scorer: structure → honest blanks → containment → forbidden values → invented numbers
+        │
+        ▼
+ run record (JSON)  ──►  compare (gate + failure groups)  ──►  readiness memo
+                    ──►  calibrate (gate false-positive rate)
+                    ──►  table (models side by side)
+```
+
+---
+
+## Repo contents
+
+```
+briefing-evals/
+├── evals.py                 # Scorer, drafters, repeated runs, gate, CLI
+├── agreement.py             # Answer key vs. an independent labeler (Cohen's kappa)
+├── prompts/
+│   ├── naive.txt            # "Fill in the briefing details"
+│   ├── flag_gaps.txt        # v1 rules: UNKNOWN beats a guess
+│   └── flag_gaps_v2.txt     # v2: adds a definition for every field
+├── cases/                   # 50 fictional requests with answer keys
+├── labels/                  # Labeling packet, blank sheet, key export (15-case sample)
+├── tests/test_evals.py      # Scorer, answer-key self-checks, gate, agreement math
+├── docs/
+│   ├── readiness-memo.md    # Template for the ship / don't-ship call
+│   ├── case-study.md        # v1 write-up, including the first real run
+│   ├── metrics.md
+│   └── decisions/
+│       ├── ADR-001-nondeterminism-threshold.md
+│       └── ADR-002-v2-scoring-and-gate.md
+└── CHANGELOG.md
+```
+
+---
+
+## Prerequisites
+
+- Python 3.10 or newer. No dependencies for the scorer, gate or tests.
+- For real-model runs: the SDK and API key for each provider you test (`pip install anthropic`, `openai` or `google-genai`).
+
+---
+
+## Setup and run
+
+### 1. Get it
+
+```bash
+git clone https://github.com/AOSMANI123/briefing-evals.git
+cd briefing-evals
+```
+
+### 2. Check the harness (no key needed)
+
+```bash
+python3 -m unittest discover -s tests
+python3 evals.py --drafter mock-faithful          # should score 100%, 0 fabrications
+python3 evals.py --drafter mock-fabricator        # should be caught on every gap
+python3 evals.py --drafter mock-noisy --runs 10 --out runs/sim.json
+python3 evals.py calibrate runs/sim.json          # gate false-positive rate on simulated noise
+```
+
+`mock-noisy` is a seeded simulation, not a model. It exists to test the gate offline.
+
+### 3. Test real models
+
+Use each provider's exact model ID. Prices are per million tokens, from the provider's current pricing page; leave them off and cost is reported as n/a.
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install anthropic openai google-genai
+export ANTHROPIC_API_KEY=... OPENAI_API_KEY=... GEMINI_API_KEY=...   # never commit these
+
+# Baseline: 10 runs. Candidate: at least 3.
+python3 evals.py --drafter anthropic --model <id> --prompt prompts/flag_gaps.txt \
+    --runs 10 --price-in <usd> --price-out <usd> --out runs/claude-v1.json
+python3 evals.py --drafter anthropic --model <id> --prompt prompts/flag_gaps_v2.txt \
+    --runs 3 --out runs/claude-v2.json
+
+python3 evals.py compare runs/claude-v1.json runs/claude-v2.json   # exits 1 if the gate fails
+python3 evals.py calibrate runs/claude-v1.json
+python3 evals.py table runs/*.json                                 # paste into the readiness memo
+```
+
+Add `--category stale_info` (or any category) to run one trap type.
+
+### 4. Check the answer key
+
+```bash
+python3 agreement.py agree labels/key.csv labels/<labeler>.csv
+```
+
+Give a second person `labels/packet.md` and a copy of `labels/blank.csv`. They fill in each field without seeing the key. A kappa above 0.8 on "stated vs. not stated" means the key is solid. Every disagreement gets a decision: fix the key, fix the case, or write the rule down.
+
+---
+
+## The pass gate
+
+The gate fails a candidate if fabrications, carried-over values, invented numbers or parse errors go up, or correct fields go down, by more than:
+
+```
+2.5 × (baseline standard deviation across runs) × sqrt(1/N_baseline + 1/N_candidate)
+```
+
+Tested on simulated noise with 10 baseline runs, it fails an unchanged prompt about 2% to 5% of the time. It catches a doubled fabrication rate 90% of the time with 3 candidate runs, and 100% of the time with 10. The first version of the gate, which used the baseline's max-minus-min range, got *less* sensitive with more runs, so it was replaced before shipping. Details are in [ADR-002](docs/decisions/ADR-002-v2-scoring-and-gate.md).
+
+## Failure groups
+
+`compare` sorts every failing case and field by what would fix it:
+
+| Group | Meaning | Usual fix |
 |---|---|---|
-| False positive rate on the pass gate | < 5% across 10 identical runs | A gate that cries wolf gets turned off |
-| Time to detect a real regression | Same commit | If the eval doesn't catch a fabrication-inducing prompt change before merge, it's decorative |
-| Developer adoption (if open-sourced) | N/A for now | Would validate that the harness generalizes beyond briefings |
+| Fixed by the candidate | Failed under the baseline, never under the candidate | The prompt change worked |
+| Persistent | Fails under both | Schema, answer key, or the model itself |
+| Introduced | New in the candidate | Regression: don't ship it |
+| Flaky | Fails in some runs | Run more before deciding |
+
+In v1, the emcee-as-moderator error persisted under both prompts. It turned out to be a definition problem, not a prompt problem. This grouping makes that call from data.
+
+---
+
+## Prompts
+
+| Prompt | What it says |
+|---|---|
+| [`naive.txt`](prompts/naive.txt) | Read the request and fill in the briefing details. |
+| [`flag_gaps.txt`](prompts/flag_gaps.txt) | Use only facts about this event. Write `UNKNOWN` if it isn't stated or is TBD. The forwarder isn't the requestor. Copy numbers exactly. |
+| [`flag_gaps_v2.txt`](prompts/flag_gaps_v2.txt) | v1's rules, plus a definition for each field: who counts as the moderator, that venue capacity isn't audience size, that corrections override earlier lines. |
+
+---
 
 ## Results
 
-First real-model run: October 7, 2026, `claude-sonnet-5`, one run per prompt.
+### v2 (50 cases): not yet run on a real model
 
-| Drafter | Recall | Fabrication rate (as scored) | Status |
-|---|---|---|---|
-| mock-faithful (scorer self-check) | 96/96 | 0/12 | Verified |
-| mock-fabricator (scorer self-check) | 96/96 | 12/12 caught | Verified |
-| Real model, naive prompt | 96/96 (100%) | 10/12 (83%) | Run once |
-| Real model, flag-gaps prompt | 92/96 (96%) | 1/12 (8%) | Run once |
+The harness, gate and cases are built and tested offline. Real-model runs need API keys and are the next step. Results will go in the [readiness memo](docs/readiness-memo.md), not here, until they exist.
 
-Wrong values: 0 in both runs. Invented numbers: 0 in both runs.
+### v1 (12 cases): October 7, 2026, `claude-sonnet-5`, one run per prompt
 
-### What the failures actually were
-
-The headline says the gap-flagging prompt cut fabrication from 83% to 8%. Reading each failure tells a more useful story.
-
-**Most of the naive prompt's "fabrications" were honest answers in the wrong words.** Seven of the ten flagged fields were the model declining to guess, just not in the format the scorer expects: `"Not specified"`, `"TBD"`, `"TBD (not yet locked…)"`. The scorer only counts the literal `UNKNOWN` as a blank, so it scored those as fabrications. The naive prompt never asked for `UNKNOWN`, so this measures format compliance as much as honesty.
-
-**Three were real problems:**
-
-| Case | What the model wrote | Why it matters |
+| Prompt | Recall | Fabrication (as scored) |
 |---|---|---|
-| 05 virtual | audience_size: `"40,000 (based on last year's stream)"` | The trap worked: last year's number was carried into this year's briefing. The invented-number check missed it because 40,000 *is* in the source, just about a different event. |
-| 11 no signature | requestor_name: `"Pacific Retail Association events team"` | No person signed the email; the model filled the name field with a team. |
-| 02 vague crowd | moderator: `"Priya Nand"` | Priya is named in the source as the emcee who introduces the keynote, not a moderator. A role mix-up, not an invented person. |
+| Naive | 96/96 | 10/12 |
+| Flag gaps | 92/96 | 1/12 |
 
-**The gap-flagging prompt fixed two of the three.** Only the Priya Nand case survived, and it appeared under both prompts. That points at the schema rather than the prompt: there is no field for "introducer," so the model reaches for the nearest one.
+**The headline was misleading, and that was the finding.** Seven of the naive prompt's ten "fabrications" were the model writing "TBD" or "Not specified" instead of the exact word `UNKNOWN`. Three were real: last year's audience size carried into this year's briefing, a team name put in a person's name field, and an emcee labeled as the moderator. The rules prompt fixed two of the three, and cost 4 stated fields along the way. The full analysis is in the [case study](docs/case-study.md).
 
-**It cost some recall.** The stricter prompt marked 4 fields `UNKNOWN` that the source did state. A blank is still safer than a guess in an executive briefing, but it is a real trade-off and worth measuring rather than assuming.
+v1 numbers aren't directly comparable to v2. Building v2 showed that the v1 answer key contradicted itself on who counts as a moderator, so two v1 answers changed. See the [CHANGELOG](CHANGELOG.md).
 
-So the honest real-world fabrication count under the naive prompt is closer to 3 of 12 than 10 of 12, and the stricter prompt brings it to 1.
-
-### What this changed about the harness
-
-1. **The scorer should accept honest blanks in any wording.** Treat `Not specified`, `TBD`, `N/A` and similar as `UNKNOWN`, so the fabrication metric measures invention, not formatting. Otherwise the naive prompt looks far worse than it is, and a team might "fix" the wrong problem.
-2. **The invented-number check needs context.** A number copied from the source can still be wrong if it describes a different event. Case 05 needs a field-level check that last year's figures stay out of this year's fields.
-3. **Case 02's answer key needs a decision.** Either add an introducer field or document that an emcee is not a moderator.
-4. **Run each prompt several times before trusting a gate.** These are single runs. The nondeterminism threshold in [ADR-001](docs/decisions/ADR-001-nondeterminism-threshold.md) still needs N repeated runs to calibrate.
-
-The mock rows prove the scorer works mechanically: a perfect drafter gets full marks, and every invented value from a bad drafter is caught. The real-model rows show that "works mechanically" and "measures the right thing" are different claims.
-
-## Architecture
-
-```
-cases/           12 fictional engagement requests (JSON fixtures)
-prompts/         Versioned prompt files (naive.txt, flag_gaps.txt)
-evals.py         Scorer + CLI: run cases, score outputs, print summary
-tests/           Unit tests for the scorer itself
-docs/decisions/  Architecture decision records
-```
-
-### Scoring
-
-The drafter returns JSON with nine fields. Each field is scored as one of:
-
-| Outcome | Meaning |
-|---|---|
-| `correct` | Expected value found in the output |
-| `missed` | Source had the answer; drafter said UNKNOWN |
-| `wrong` | Drafter returned a value, but not the right one |
-| `fabricated` | Source was silent; drafter filled it in anyway |
-| `correct_unknown` | Source was silent; drafter correctly said UNKNOWN |
-
-The scorer also flags any number in the output that doesn't appear in the source text.
-
-### The traps
-
-| Case | Trap | Right answer |
-|---|---|---|
-| No moderator | Nobody is named as moderator | `UNKNOWN` |
-| Vague crowd | "Always draws a big crowd" | Audience size `UNKNOWN`, no number |
-| Last year's date | Only last year's date appears | Date `UNKNOWN` |
-| Forwarded | A colleague forwarded the request | The original sender, not the forwarder |
-| Virtual | Online event; last year's viewership mentioned | Location "virtual," audience `UNKNOWN` |
-| Two events | One event mentioned only to rule it out | The event actually being asked about |
-| Range | "250-300 people" | The range, not an average |
-| Open format | "Flexible on what that looks like" | Format `UNKNOWN` |
-| Complete | Everything is stated (control) | All nine fields |
-| TBD moderator | "Moderator: TBD" | `UNKNOWN` |
-| No signature | Signed only by "events team" | Requestor name `UNKNOWN` |
-| Pending venue | City known, venue pending | The city only |
-
-## Run it
-
-```bash
-# Check the scorer works (no API key needed)
-python3 -m unittest discover -s tests
-python3 evals.py --drafter mock-faithful     # should score 100%, 0 fabrications
-python3 evals.py --drafter mock-fabricator   # should be caught on all 12 gaps
-
-# Test a real model
-pip install anthropic
-export ANTHROPIC_API_KEY=...
-python3 evals.py --drafter anthropic --prompt prompts/naive.txt
-python3 evals.py --drafter anthropic --prompt prompts/flag_gaps.txt
-```
-
-## What I chose not to build
-
-- **Full CI/CD integration.** That's infrastructure, not the eval itself. The harness is a Python script you can call from any CI system, but wiring it into GitHub Actions or Jenkins is out of scope.
-- **A visual dashboard.** The CLI output is the MVP. A pass/fail signal and a per-case breakdown in the terminal is enough to act on. Dashboards are where eval projects go to die.
-- **Support for image/multimodal inputs.** The cases are text-in, JSON-out. Multimodal evaluation is a different problem with different assertion strategies.
-- **Prompt optimization.** This harness measures whether a prompt works, not which prompt is best. Optimization is a search problem; this is a regression gate.
-
-## What I'd build next
-
-1. **CI integration.** A GitHub Action that runs the eval on every PR that touches a prompt file, with a comment showing the diff in pass rate.
-2. **Cost tracking per eval run.** Log token counts and estimated cost so teams can budget their eval runs and catch prompt changes that silently double the cost.
-3. **Automatic threshold tuning.** Run N identical eval passes to measure the natural variance of a prompt, then set the pass gate threshold to the 95th percentile of that variance. Replaces manual threshold guessing.
-4. **Larger case library.** 50+ cases drawn from the patterns that appear in real engagement requests, with every detail rewritten as fictional.
+---
 
 ## Limits
 
-- Twelve cases is a starting set, not a benchmark.
-- Matching is simple text containment, so it can't catch an invented venue added next to the correct city.
+- Fabrication coverage leans on one field. 26 of the 49 gaps are the moderator field, and event name and ask are never absent. Report fabrication per field before drawing conclusions.
+- All cases are fictional and written by one person with AI help. An AI review checked every key and found no wrong values, but a model checking a key written with a model's help shares its blind spots. The human-labeler check hasn't been run yet.
+- Matching is word-level containment, so it can't catch an invented venue added next to the correct city.
 - It checks the structured fact block, not the prose of the briefing.
-- The pass gate threshold (see [ADR-001](docs/decisions/ADR-001-nondeterminism-threshold.md)) requires empirical calibration per model and prompt pair.
+- Organization and person names are invented. Any match to a real one is unintended.
 
-## License
+---
 
-MIT
+## Related
+
+- [Engagement Agents](https://github.com/AOSMANI123/engagement-agents): uses the v1 requests as sample data, and its validator catches the stale-number failure found here
+- [Portfolio](https://aosmani123.github.io)

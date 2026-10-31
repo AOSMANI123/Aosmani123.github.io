@@ -18,7 +18,7 @@ This repo is my personal site and the projects on it.
 ### Measuring AI quality
 | Project | What it is |
 |---|---|
-| [LLM prompt eval harness](https://aosmani123.github.io/projects/briefing-evals/) · [code](https://github.com/AOSMANI123/briefing-evals) | Golden-set regression testing for prompts. Run against a real model: a gap-flagging prompt cut real fabrications from 3 of 12 cases to 1. |
+| [Briefing evals: model readiness](https://aosmani123.github.io/projects/briefing-evals/) · [code](https://github.com/AOSMANI123/briefing-evals) | Tests whether an AI briefing drafter invents facts: 50 trap cases, repeated runs, a noise-calibrated pass gate, multi-provider runs, and an answer-key agreement check. In v1, a gap-flagging prompt cut real fabrications from 3 of 12 cases to 1. |
 | [Coverage gap detector](https://aosmani123.github.io/projects/coverage-gap/) · [code](https://github.com/AOSMANI123/coverage-gap) | Scores a news brief on what it missed, not just what it included. Coverage score, entity breakdown, missed-consensus report. |
 | [Executive writing critic](https://aosmani123.github.io/projects/writing-critic/) · [code](https://github.com/AOSMANI123/writing-critic) | Seven deterministic checks against an executive writing bar. CLI + web scorer. Python stdlib, no dependencies. |
 
@@ -50,7 +50,7 @@ projects/
   engagement-automation/       AI engagement automation case study
   engagement-triage/           engagement tracker template + setup guide
   # measuring AI quality
-  briefing-evals/              LLM prompt eval harness, 12 cases, tests
+  briefing-evals/              model-readiness evals, 50 cases, gate, tests
   coverage-gap/                coverage gap detector for news briefs
   writing-critic/              executive writing scorer: CLI + web demo
   # product judgment
