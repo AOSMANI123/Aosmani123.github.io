@@ -133,6 +133,14 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
 .project .go{margin-top:auto;font-family:var(--mono);font-size:.76rem;color:var(--teal)}
 .project .kind{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
 
+.pgroup{margin-top:38px}
+.pgroup:first-of-type{margin-top:30px}
+.pgroup-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.pgroup-head h3{font-size:1.35rem}
+.pgroup-head p{font-size:.94rem;color:var(--muted);flex:1;min-width:16rem}
+.pgroup .projects{margin-top:18px}
+.projects.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+
 /* principles */
 .principles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 44px;margin-top:30px}
 .principle{min-width:0}
@@ -178,7 +186,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
   .arrow{transform:rotate(90deg);justify-self:center}
   .case{grid-template-columns:1fr}
   .outside{grid-template-columns:1fr}
-  .projects{grid-template-columns:1fr}
+  .projects,.projects.two{grid-template-columns:1fr}
 }
 @media (max-width:640px){
   .records,.principles,.steps{grid-template-columns:1fr}
@@ -284,7 +292,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
     <span class="label">Build 02 · Microsoft</span>
     <div>
       <h2>One tracker instead of three manual workflows</h2>
-      <p class="intro">Engagement requests for a Corporate Vice President came in through three separate manual workflows. I rebuilt it as one pipeline in Power Automate, AI Builder and SharePoint.</p>
+      <p class="intro">Engagement requests for a senior marketing executive came in through three separate manual workflows. I rebuilt it as one pipeline in Power Automate, AI Builder and SharePoint.</p>
       <ol class="pipe">
         <li><b>Requests land in one list</b><span>AI Builder pulls the event, date, requestor and organization out of each email and writes a short summary.</span></li>
         <li><b>Monday digest</b><span>Open requests that need a decision arrive in one email, each with its summary, so nobody has to open every thread.</span></li>
@@ -343,12 +351,14 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
     <span class="label">Projects</span>
     <div>
       <h2>Work you can open</h2>
-      <p class="intro">Shipped systems, working tools and product analysis. Each project follows a PM skeleton: problem, metrics, results, and what I chose not to build. Anything not yet tested with users is labeled that way.</p>
-      <div class="projects" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <p class="intro">Three kinds of work: systems I shipped, tools that measure AI quality, and product analysis. Each project follows a PM skeleton: problem, metrics, results, and what I chose not to build. Anything not yet tested with users is labeled that way.</p>
+      <div class="pgroup">
+        <div class="pgroup-head"><h3>Shipped at work</h3><p>Systems running in real executive offices, with the result each one moved.</p></div>
+        <div class="projects">
         <a class="project" href="projects/agent-system/">
           <span class="kind">Architecture · Shipped</span>
           <h3>Seven-agent system for executive engagements</h3>
-          <p>Designed a multi-agent orchestration system managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval.</p>
+          <p>Designed a multi-agent orchestration system managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. A runnable public version is on GitHub.</p>
           <span class="go" style="margin-top:8px">
             <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Multi-agent orchestration · Architecture diagram</span>
             See the architecture →
@@ -363,13 +373,27 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
             Read the case study →
           </span>
         </a>
-        <a class="project" href="projects/writing-critic/">
-          <span class="kind">Developer tool + web demo</span>
-          <h3>Executive writing critic</h3>
-          <p>Seven deterministic checks against an explicit executive writing bar: hedge words, passive voice, data density, adjective bloat, sentence variety, buried lede, opening specificity.</p>
+        <a class="project" href="projects/engagement-triage/">
+          <span class="kind">Case study + free template · Shipped</span>
+          <h3>Engagement tracker template</h3>
+          <p>A generalized version of the automation system that any office can set up. Case study plus a free, step-by-step template.</p>
           <span class="go" style="margin-top:8px">
-            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Python stdlib · Vanilla JS · CLI + web scorer</span>
-            Try the scorer →
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Microsoft 365 · Power Automate · AI Builder</span>
+            See the tracker →
+          </span>
+        </a>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-head"><h3>Measuring AI quality</h3><p>Tools that check whether AI output is right, not just whether it looks right.</p></div>
+        <div class="projects">
+        <a class="project" href="projects/briefing-evals/">
+          <span class="kind">Eval harness · Code</span>
+          <h3>LLM prompt eval harness</h3>
+          <p>Golden-set regression testing for prompts. Versioned prompts, fixture inputs, nondeterminism-tolerant assertions, and a pass gate that blocks regressions.</p>
+          <span class="go" style="margin-top:8px">
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Python · No dependencies</span>
+            See the harness →
           </span>
         </a>
         <a class="project" href="projects/coverage-gap/">
@@ -381,15 +405,20 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
             See the evaluator →
           </span>
         </a>
-        <a class="project" href="projects/briefing-evals/">
-          <span class="kind">Eval harness · Code</span>
-          <h3>LLM prompt eval harness</h3>
-          <p>Golden-set regression testing for prompts. Versioned prompts, fixture inputs, nondeterminism-tolerant assertions, and a pass gate that blocks regressions.</p>
+        <a class="project" href="projects/writing-critic/">
+          <span class="kind">Developer tool + web demo</span>
+          <h3>Executive writing critic</h3>
+          <p>Seven deterministic checks against an explicit executive writing bar: hedge words, passive voice, data density, adjective bloat, sentence variety, buried lede, opening specificity.</p>
           <span class="go" style="margin-top:8px">
-            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Python · No dependencies</span>
-            See the harness →
+            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Stack: Python stdlib · Vanilla JS · CLI + web scorer</span>
+            Try the scorer →
           </span>
         </a>
+        </div>
+      </div>
+      <div class="pgroup">
+        <div class="pgroup-head"><h3>Product judgment</h3><p>Teardowns and a spec: what to build, what to cut, and what data would change my mind.</p></div>
+        <div class="projects two">
         <a class="project" href="projects/ai-teardowns/">
           <span class="kind">Product thinking · Analysis</span>
           <h3>AI product teardowns</h3>
@@ -397,15 +426,6 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
           <span class="go" style="margin-top:8px">
             <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Method: Metrics tree · Funnel analysis · Product judgment</span>
             Read the teardowns →
-          </span>
-        </a>
-        <a class="project" href="projects/engagement-triage/">
-          <span class="kind">Case study + free template · Shipped</span>
-          <h3>Engagement tracker template</h3>
-          <p>A generalized version of the automation system that any office can set up. Case study plus a free, step-by-step template.</p>
-          <span class="go" style="margin-top:8px">
-            <span style="display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Tools: Microsoft 365 · Power Automate · AI Builder</span>
-            See the tracker →
           </span>
         </a>
         <a class="project" href="projects/whatsapp-signups/">
@@ -417,6 +437,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
             Read the spec →
           </span>
         </a>
+        </div>
       </div>
     </div>
   </section>
@@ -443,17 +464,17 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
         <li>
           <span class="when">June 2026 – now</span>
           <div><h3>Amazon <span>· Communications Specialist, CEO Communications</span></h3>
-          <p>Own the CEO's external engagement portfolio. Built the seven-agent system, ran the media monitoring evaluation, and serve as the team's AI champion.</p></div>
+          <p>Own a senior executive's external engagement portfolio. Built the seven-agent system, ran the media monitoring evaluation, and serve as the team's AI champion.</p></div>
         </li>
         <li>
           <span class="when">2025 – 2026</span>
           <div><h3>Microsoft <span>· Business &amp; Communications Manager, Security Marketing</span></h3>
-          <p>Executive staff to the CVP. Built the engagement tracker, stood up the launch council, and led AI enablement through a channel reaching 12,000+ people.</p></div>
+          <p>Executive staff to the head of Security Marketing. Built the engagement tracker, stood up the launch council, and led AI enablement through a channel reaching 12,000+ people.</p></div>
         </li>
         <li>
           <span class="when">2023 – 2025</span>
-          <div><h3>Microsoft <span>· Research, Insights &amp; Communications Manager, Office of the CEO</span></h3>
-          <p>Led a team of 5 on the weekly CEO Board of Directors Update and a team of 8 on real-time keynote dashboards.</p></div>
+          <div><h3>Microsoft <span>· Research, Insights &amp; Communications Manager, Executive Communications</span></h3>
+          <p>Led a team of 5 on a weekly board-level update and a team of 8 on real-time keynote dashboards.</p></div>
         </li>
         <li>
           <span class="when">2021 – 2023</span>

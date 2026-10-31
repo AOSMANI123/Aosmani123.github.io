@@ -8,17 +8,25 @@ This repo is my personal site and the projects on it.
 
 ## Projects
 
-| Project | What it is | Type |
-|---|---|---|
-| [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) | Multi-agent orchestration managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. | Shipped |
-| [Engagement Agents (code)](https://github.com/AOSMANI123/engagement-agents) | Runnable public version of the agent system: intake, validation, triage and drafting, with a review queue and no send step. | Working code |
-| [AI-powered engagement automation](https://aosmani123.github.io/projects/engagement-automation/) | Rebuilt an executive's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. | Shipped |
-| [Executive writing critic](https://aosmani123.github.io/projects/writing-critic/) · [code](https://github.com/AOSMANI123/writing-critic) | Seven deterministic checks against an executive writing bar. CLI + web scorer. Python stdlib, no dependencies. | Working code |
-| [Coverage gap detector](https://aosmani123.github.io/projects/coverage-gap/) · [code](https://github.com/AOSMANI123/coverage-gap) | Evaluates whether a news brief covers what was actually available. Coverage score, entity breakdown, missed-consensus report. | Working code |
-| [LLM prompt eval harness](https://aosmani123.github.io/projects/briefing-evals/) · [code](https://github.com/AOSMANI123/briefing-evals) | Golden-set regression testing for prompts. Nondeterminism-tolerant assertions and a pass gate that blocks regressions. | Working code |
-| [AI product teardowns](https://aosmani123.github.io/projects/ai-teardowns/) | Five teardowns of shipped AI products: metrics tree, funnel, feature to kill, feature to build, what data would change my mind. | Analysis |
-| [Engagement tracker template](https://aosmani123.github.io/projects/engagement-triage/) | A generalized version of the automation system that any office can set up. Case study plus a free, step-by-step [template](projects/engagement-triage/template). | Shipped |
-| [Sign-up lists for WhatsApp Communities](https://aosmani123.github.io/projects/whatsapp-signups/) | A product teardown of how Communities handles events, three options, a spec and a metrics plan. | Spec |
+### Shipped at work
+| Project | What it is |
+|---|---|
+| [Seven-agent system](https://aosmani123.github.io/projects/agent-system/) · [code](https://github.com/AOSMANI123/engagement-agents) | Multi-agent orchestration managing 200+ executive engagement items across intake, triage, briefing production and knowledge retrieval. The code link is a runnable public version with a review queue and no send step. |
+| [AI-powered engagement automation](https://aosmani123.github.io/projects/engagement-automation/) | Rebuilt an executive's engagement workflow from three manual processes into one AI-assisted pipeline. ~80% less processing time. |
+| [Engagement tracker template](https://aosmani123.github.io/projects/engagement-triage/) | A generalized version of that system any office can set up, with a free step-by-step [template](projects/engagement-triage/template). |
+
+### Measuring AI quality
+| Project | What it is |
+|---|---|
+| [LLM prompt eval harness](https://aosmani123.github.io/projects/briefing-evals/) · [code](https://github.com/AOSMANI123/briefing-evals) | Golden-set regression testing for prompts. Run against a real model: a gap-flagging prompt cut real fabrications from 3 of 12 cases to 1. |
+| [Coverage gap detector](https://aosmani123.github.io/projects/coverage-gap/) · [code](https://github.com/AOSMANI123/coverage-gap) | Scores a news brief on what it missed, not just what it included. Coverage score, entity breakdown, missed-consensus report. |
+| [Executive writing critic](https://aosmani123.github.io/projects/writing-critic/) · [code](https://github.com/AOSMANI123/writing-critic) | Seven deterministic checks against an executive writing bar. CLI + web scorer. Python stdlib, no dependencies. |
+
+### Product judgment
+| Project | What it is |
+|---|---|
+| [AI product teardowns](https://aosmani123.github.io/projects/ai-teardowns/) | ChatGPT, Copilot, Notion AI, Midjourney, Grammarly: metrics tree, funnel, a feature to kill, a feature to build, what data would change my mind. |
+| [Sign-up lists for WhatsApp Communities](https://aosmani123.github.io/projects/whatsapp-signups/) | A teardown of how Communities handles events, three options, a spec and a metrics plan. |
 
 Anything that hasn't been tested with users or run against a real model is labeled that way.
 
@@ -37,13 +45,16 @@ One rule runs through every AI system I build: **the human is always the final s
 index.html                     personal site
 assets/project.css             shared styles for project pages
 projects/
-  agent-system/                seven-agent system architecture (shipped)
-  engagement-automation/       AI engagement automation case study (Microsoft)
-  writing-critic/              executive writing scorer — CLI + web demo
-  coverage-gap/                coverage gap detector for news briefs
-  briefing-evals/              LLM prompt eval harness, 12 cases, tests
-  ai-teardowns/                five AI product teardowns
+  # shipped at work
+  agent-system/                seven-agent system architecture
+  engagement-automation/       AI engagement automation case study
   engagement-triage/           engagement tracker template + setup guide
+  # measuring AI quality
+  briefing-evals/              LLM prompt eval harness, 12 cases, tests
+  coverage-gap/                coverage gap detector for news briefs
+  writing-critic/              executive writing scorer: CLI + web demo
+  # product judgment
+  ai-teardowns/                five AI product teardowns
   whatsapp-signups/            teardown + spec
 ```
 
