@@ -3,28 +3,28 @@
 <rect width="741" height="30" rx="10" fill="#161b22"/><rect y="20" width="741" height="10" fill="#161b22"/>
 <circle cx="18" cy="15" r="5" fill="#ff5f56"/><circle cx="36" cy="15" r="5" fill="#ffbd2e"/><circle cx="54" cy="15" r="5" fill="#27c93f"/>
 <text x="370.5" y="19" fill="#8b949e" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" text-anchor="middle">engagement-agents · output/review_queue.md</text>
-<g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" xml:space="preserve">
-<text x="18" y="56"><tspan fill="#7ee787">$</tspan><tspan fill="#e6edf3"> python3 main.py</tspan></text>
+<g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" xml:space="preserve" style="white-space:pre">
+<text x="18" y="56"><tspan fill="#7ee787">$</tspan><tspan fill="#e6edf3"> python3 main.py</tspan></text>
 <text x="18" y="75"></text>
-<text x="18" y="94"><tspan fill="#e6edf3">Engagement review queue</tspan></text>
+<text x="18" y="94"><tspan fill="#e6edf3">Engagement review queue</tspan></text>
 <text x="18" y="113"></text>
-<text x="18" y="132"><tspan fill="#e6edf3">Run on November 18, 2026 · intake mode: rules · 12 requests</tspan></text>
+<text x="18" y="132"><tspan fill="#e6edf3">Run on November 18, 2026 · intake mode: rules · 12 requests</tspan></text>
 <text x="18" y="151"></text>
-<text x="18" y="170"><tspan fill="#56d4dd">  Request             Status              Priority  Score</tspan></text>
-<text x="18" y="189"><tspan fill="#e6edf3">  -------------------------------------------------------</tspan></text>
-<text x="18" y="208"><tspan fill="#e6edf3">  09-complete         Ready for review    High         97</tspan></text>
-<text x="18" y="227"><tspan fill="#e6edf3">  04-forwarded        Ready for review    High         90</tspan></text>
-<text x="18" y="246"><tspan fill="#e6edf3">  07-range            Ready for review    High         90</tspan></text>
-<text x="18" y="265"><tspan fill="#e6edf3">  12-pending-venue    Ready for review    High         90</tspan></text>
-<text x="18" y="284"><tspan fill="#e6edf3">  01-no-moderator     Ready for review    High         87</tspan></text>
-<text x="18" y="303"><tspan fill="#e6edf3">  10-tbd-moderator    Ready for review    High         87</tspan></text>
-<text x="18" y="322"><tspan fill="#e6edf3">  06-two-events       Ready for review    High         72</tspan></text>
-<text x="18" y="341"><tspan fill="#e6edf3">  02-vague-crowd      Ready for review    Medium       69</tspan></text>
-<text x="18" y="360"><tspan fill="#e6edf3">  11-no-signature     Ready for review    Medium       59</tspan></text>
-<text x="18" y="379"><tspan fill="#e6edf3">  05-virtual          Ready for review    Medium       57</tspan></text>
-<text x="18" y="398"><tspan fill="#e6edf3">  08-format-unclear   Ready for review    Medium       47</tspan></text>
-<text x="18" y="417"><tspan fill="#e3b341">  03-last-years-date  Needs info          Medium       52</tspan></text>
+<text x="18" y="170"><tspan fill="#56d4dd">  Request             Status              Priority  Score</tspan></text>
+<text x="18" y="189"><tspan fill="#e6edf3">  -------------------------------------------------------</tspan></text>
+<text x="18" y="208"><tspan fill="#e6edf3">  09-complete         Ready for review    High         97</tspan></text>
+<text x="18" y="227"><tspan fill="#e6edf3">  04-forwarded        Ready for review    High         90</tspan></text>
+<text x="18" y="246"><tspan fill="#e6edf3">  07-range            Ready for review    High         90</tspan></text>
+<text x="18" y="265"><tspan fill="#e6edf3">  12-pending-venue    Ready for review    High         90</tspan></text>
+<text x="18" y="284"><tspan fill="#e6edf3">  01-no-moderator     Ready for review    High         87</tspan></text>
+<text x="18" y="303"><tspan fill="#e6edf3">  10-tbd-moderator    Ready for review    High         87</tspan></text>
+<text x="18" y="322"><tspan fill="#e6edf3">  06-two-events       Ready for review    High         72</tspan></text>
+<text x="18" y="341"><tspan fill="#e6edf3">  02-vague-crowd      Ready for review    Medium       69</tspan></text>
+<text x="18" y="360"><tspan fill="#e6edf3">  11-no-signature     Ready for review    Medium       59</tspan></text>
+<text x="18" y="379"><tspan fill="#e6edf3">  05-virtual          Ready for review    Medium       57</tspan></text>
+<text x="18" y="398"><tspan fill="#e6edf3">  08-format-unclear   Ready for review    Medium       47</tspan></text>
+<text x="18" y="417"><tspan fill="#e3b341">  03-last-years-date  Needs info          Medium       52</tspan></text>
 <text x="18" y="436"></text>
-<text x="18" y="455"><tspan fill="#e6edf3">  </tspan><tspan fill="#7ee787">11 ready · 1 need info · 0 blocked</tspan></text>
-<text x="18" y="474"><tspan fill="#e6edf3">  Nothing below has been sent. Every reply is a draft for a person to edit and send.</tspan></text>
+<text x="18" y="455"><tspan fill="#e6edf3">  </tspan><tspan fill="#7ee787">11 ready · 1 need info · 0 blocked</tspan></text>
+<text x="18" y="474"><tspan fill="#e6edf3">  Nothing below has been sent. Every reply is a draft for a person to edit and send.</tspan></text>
 </g></svg>
