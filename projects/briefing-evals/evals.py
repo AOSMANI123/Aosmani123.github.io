@@ -19,6 +19,14 @@ Estimate the gate's false-positive rate from one N-run file:
 
 Table of several saved runs (for the readiness memo):
     python3 evals.py table runs/*.json
+
+Route each request to a cheap or strong model, and flag risky ones for a person:
+    python3 evals.py --route --cheap-drafter mock-cheap --strong-drafter mock-strong --runs 10
+    python3 evals.py --route --drafter anthropic --cheap-model <cheap-id> --cheap-price IN OUT \
+        --strong-model <strong-id> --strong-price IN OUT --runs 10 --out runs/routed.json
+
+Estimate what a run will cost before making any paid call:
+    python3 evals.py estimate --runs 10 --price 2 10 --price 0.10 0.50
 """
 from __future__ import annotations
 
@@ -251,6 +259,44 @@ def mock_noisy(case: Case, prompt: str, run: int = 0, p_fab: float = 0.10, p_mis
     return out
 
 
+# Simulated cheap and strong models, for testing routing offline. The error rates are
+# assumptions written here, not measurements: a cheap model falls for a trap more often
+# than a strong one, and both rarely slip on a control case. The simulation knows each
+# case's category, which a real router never sees. Its numbers show the plumbing works
+# and say nothing about any real model.
+SIM_RATES = {  # tier -> (p_fab on trap cases, p_fab on controls, p_miss)
+    "cheap": (0.22, 0.02, 0.05),
+    "strong": (0.06, 0.02, 0.02),
+}
+
+
+def _mock_tier(tier: str, case: Case, run: int) -> dict:
+    trap, control, miss = SIM_RATES[tier]
+    p_fab = control if case.category == "control" else trap
+    rng = random.Random(f"{tier}:{case.id}:{run}")
+    out = {}
+    for f in FIELDS:
+        if case.expected[f] is None:
+            out[f] = PLAUSIBLE[f] if rng.random() < p_fab else UNKNOWN
+        else:
+            out[f] = UNKNOWN if rng.random() < miss else case.expected[f][0]
+    return out
+
+
+def mock_cheap(case: Case, prompt: str, run: int = 0) -> dict:
+    return _mock_tier("cheap", case, run)
+
+
+def mock_strong(case: Case, prompt: str, run: int = 0) -> dict:
+    return _mock_tier("strong", case, run)
+
+
+def estimate_tokens(prompt: str, source: str, output_tokens: int = 150) -> dict:
+    """Rough token count, about 4 characters per token, for planning spend before any
+    paid call. Thinking tokens aren't included, so real output counts will be higher."""
+    return {"input_tokens": (len(prompt) + len(source)) // 4 + 10, "output_tokens": output_tokens}
+
+
 def _json_from(text: str) -> dict:
     m = re.search(r"\{.*\}", text or "", re.S)
     if not m:
@@ -324,10 +370,12 @@ def google_drafter(case: Case, prompt: str, model: str) -> tuple[dict, dict]:
                                 "seconds": time.monotonic() - t}
 
 
-MOCKS = {"mock-faithful": mock_faithful, "mock-fabricator": mock_fabricator, "mock-noisy": mock_noisy}
+MOCKS = {"mock-faithful": mock_faithful, "mock-fabricator": mock_fabricator, "mock-noisy": mock_noisy,
+         "mock-cheap": mock_cheap, "mock-strong": mock_strong}
 APIS = {"anthropic": anthropic_drafter, "openai": openai_drafter, "google": google_drafter}
 DRAFTERS = {**MOCKS, **APIS}
-SEEDED_MOCKS = {"mock-noisy"}  # mocks that take a run number, so repeated runs differ
+SEEDED_MOCKS = {"mock-noisy", "mock-cheap", "mock-strong"}  # take a run number, so runs differ
+SIMULATED = {"mock-cheap", "mock-strong"}  # report estimated tokens, so routing cost can be compared
 
 
 def call_drafter(name: str, case: Case, prompt: str, model: str | None, run: int) -> tuple[dict, dict]:
@@ -338,7 +386,8 @@ def call_drafter(name: str, case: Case, prompt: str, model: str | None, run: int
         return out, {"failure": None, **usage}
     fn = MOCKS[name]
     out = fn(case, prompt, run) if name in SEEDED_MOCKS else fn(case, prompt)
-    return out, {"input_tokens": 0, "output_tokens": 0, "seconds": 0.0, "failure": None}
+    tokens = estimate_tokens(prompt, case.source) if name in SIMULATED else {"input_tokens": 0, "output_tokens": 0}
+    return out, {**tokens, "seconds": 0.0, "failure": None}
 
 
 # ---------- suites of repeated runs ----------
@@ -350,7 +399,7 @@ def run_suite(drafter: str, prompt_path: str, model: str | None = None, runs: in
     cases = cases if cases is not None else load_cases()
     prompt = Path(prompt_path).read_text()
     record = {"drafter": drafter, "model": model or drafter, "prompt": Path(prompt_path).name,
-              "cases": len(cases), "runs": []}
+              "cases": len(cases), "runs": [], "estimated_tokens": drafter in SIMULATED}
     for i in range(runs):
         results, failures, usage = [], [], {"input_tokens": 0, "output_tokens": 0, "seconds": []}
         for c in cases:
@@ -373,6 +422,71 @@ def run_suite(drafter: str, prompt_path: str, model: str | None = None, runs: in
                          "parse_error": r.parse_error, "failure": fl,
                          "fields": [f.__dict__ for f in r.fields]}
                         for r, fl in zip(results, failures)],
+        })
+    return record
+
+
+def _cost(tokens_in: int, tokens_out: int, price: tuple[float, float] | None) -> float | None:
+    if price is None:
+        return None
+    return (tokens_in * price[0] + tokens_out * price[1]) / 1_000_000
+
+
+def run_routed(cheap: tuple[str, str | None], strong: tuple[str, str | None], prompt_path: str,
+               runs: int = 1, cases: list[Case] | None = None,
+               cheap_price: tuple[float, float] | None = None,
+               strong_price: tuple[float, float] | None = None) -> dict:
+    """Run the suite with routing: each request goes to the cheap or strong (drafter, model)
+    by router.route(), and 'review' requests are flagged for a person. Same record shape
+    as run_suite, plus where each case went and how the flag did."""
+    import router  # local module; imported here so the plain suite doesn't depend on it
+    cases = cases if cases is not None else load_cases()
+    prompt = Path(prompt_path).read_text()
+    routes = {c.id: router.route(c.source) for c in cases}
+    record = {"drafter": f"routed:{cheap[0]}/{strong[0]}",
+              "model": f"routed: {cheap[1] or cheap[0]} + {strong[1] or strong[0]}",
+              "prompt": Path(prompt_path).name, "cases": len(cases), "runs": [],
+              "routing": {"cheap": cheap[1] or cheap[0], "strong": strong[1] or strong[0],
+                          "routes": {cid: {"tier": r.tier, "reasons": r.reasons} for cid, r in routes.items()}},
+              "estimated_tokens": cheap[0] in SIMULATED or strong[0] in SIMULATED}
+    for i in range(runs):
+        results, failures, secs = [], [], []
+        tok = {"cheap": [0, 0], "strong": [0, 0]}
+        for c in cases:
+            r = routes[c.id]
+            drafter, model = cheap if r.model_tier == "cheap" else strong
+            out, u = call_drafter(drafter, c, prompt, model, i)
+            results.append(score_case(c, out))
+            failures.append(u.get("failure"))
+            tok[r.model_tier][0] += u["input_tokens"]
+            tok[r.model_tier][1] += u["output_tokens"]
+            secs.append(u["seconds"])
+        s = summarize(results, cases, failures)
+        costs = [_cost(*tok["cheap"], cheap_price), _cost(*tok["strong"], strong_price)]
+        bad = {res.case_id for res in results
+               if res.parse_error or any(f.outcome in ("fabricated", "wrong", "missed") for f in res.fields)}
+        flagged = {cid for cid, r in routes.items() if r.needs_human}
+        summary = _summary_dict(s)
+        summary.update({
+            "to_cheap": sum(1 for r in routes.values() if r.model_tier == "cheap"),
+            "to_strong": sum(1 for r in routes.values() if r.model_tier == "strong"),
+            "flagged": len(flagged),
+            "bad_cases": len(bad),
+            "bad_cases_flagged": len(bad & flagged),
+            "bad_cases_from_cheap": sum(1 for cid in bad if routes[cid].model_tier == "cheap"),
+        })
+        record["runs"].append({
+            "summary": summary,
+            "usage": {"input_tokens": tok["cheap"][0] + tok["strong"][0],
+                      "output_tokens": tok["cheap"][1] + tok["strong"][1],
+                      "by_tier": tok,
+                      "median_seconds_per_case": statistics.median(secs) if secs else 0,
+                      "cost_usd": None if None in costs else sum(costs)},
+            "results": [{"case": res.case_id, "route": routes[res.case_id].tier,
+                         "invented_numbers": sorted(res.invented_numbers),
+                         "parse_error": res.parse_error, "failure": fl,
+                         "fields": [f.__dict__ for f in res.fields]}
+                        for res, fl in zip(results, failures)],
         })
     return record
 
@@ -499,7 +613,15 @@ def print_suite(record: dict, cases: list[Case]) -> None:
               f"median {statistics.median(r['usage']['median_seconds_per_case'] for r in u):.1f}s per case")
         costs = [r["usage"]["cost_usd"] for r in u if r["usage"]["cost_usd"] is not None]
         if costs:
-            print(f"cost per run            : ${statistics.mean(costs):.4f}")
+            est = "  (estimated from text length, not billed)" if record.get("estimated_tokens") else ""
+            print(f"cost per run            : ${statistics.mean(costs):.4f}{est}")
+    if "routing" in record:
+        rs = record["runs"][-1]["summary"]
+        print(f"routing                 : {rs['to_cheap']} cases to {record['routing']['cheap']}, "
+              f"{rs['to_strong']} to {record['routing']['strong']}, {rs['flagged']} flagged for a person")
+        print(f"cases with any error    : {_mean_range(_metric(record, 'bad_cases'))}; "
+              f"from the cheap model {_mean_range(_metric(record, 'bad_cases_from_cheap'))}; "
+              f"caught by the flag {_mean_range(_metric(record, 'bad_cases_flagged'))}")
     cat = {c.id: c.category for c in cases}
     rates = _failure_rates(record)
     if rates:
@@ -555,6 +677,23 @@ def print_table(records: list[dict]) -> None:
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     cases = load_cases()
+    if argv and argv[0] == "estimate":
+        ep = argparse.ArgumentParser(prog="evals.py estimate",
+                                     description="Floor cost of a run before any paid call. No API calls.")
+        ep.add_argument("--prompt", default=str(HERE / "prompts" / "flag_gaps.txt"))
+        ep.add_argument("--runs", type=int, default=10)
+        ep.add_argument("--price", type=float, nargs=2, metavar=("IN", "OUT"), action="append", required=True,
+                        help="USD per million tokens; repeat for several models")
+        ea = ep.parse_args(argv[1:])
+        prompt = Path(ea.prompt).read_text()
+        t = [estimate_tokens(prompt, c.source) for c in cases]
+        tin, tout = sum(x["input_tokens"] for x in t), sum(x["output_tokens"] for x in t)
+        print(f"{len(cases)} cases x {ea.runs} runs, about {tin} input and {tout} output tokens per run "
+              f"(thinking not included, so treat these as a floor)")
+        for pin, pout in ea.price:
+            per = (tin * pin + tout * pout) / 1_000_000
+            print(f"  ${pin:g} in / ${pout:g} out per million: ${per:.3f} per run, ${per * ea.runs:.2f} for {ea.runs} runs")
+        return tin, tout
     if argv and argv[0] in ("compare", "calibrate", "table"):
         cmd, files = argv[0], argv[1:]
         recs = [json.loads(Path(f).read_text()) for f in files]
@@ -582,6 +721,14 @@ def main(argv=None):
     ap.add_argument("--category", help="only run cases in this category")
     ap.add_argument("--price-in", type=float, help="USD per million input tokens, from the provider's pricing page")
     ap.add_argument("--price-out", type=float, help="USD per million output tokens")
+    ap.add_argument("--route", action="store_true",
+                    help="route each request to --cheap-* or --strong-* by router.py, and flag risky ones")
+    ap.add_argument("--cheap-drafter", help="drafter for easy requests (default: --drafter)")
+    ap.add_argument("--cheap-model", help="model for easy requests")
+    ap.add_argument("--cheap-price", type=float, nargs=2, metavar=("IN", "OUT"), help="USD per million tokens")
+    ap.add_argument("--strong-drafter", help="drafter for hard and flagged requests (default: --drafter)")
+    ap.add_argument("--strong-model", help="model for hard and flagged requests")
+    ap.add_argument("--strong-price", type=float, nargs=2, metavar=("IN", "OUT"), help="USD per million tokens")
     ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
                     help="Anthropic effort level; leave out to use each model's default")
     ap.add_argument("--out", help="write the full run record to this JSON file")
@@ -590,7 +737,14 @@ def main(argv=None):
     EFFORT = args.effort
     if args.category:
         cases = [c for c in cases if c.category == args.category]
-    record = run_suite(args.drafter, args.prompt, args.model, args.runs, cases, args.price_in, args.price_out)
+    if args.route:
+        record = run_routed((args.cheap_drafter or args.drafter, args.cheap_model),
+                            (args.strong_drafter or args.drafter, args.strong_model),
+                            args.prompt, args.runs, cases,
+                            tuple(args.cheap_price) if args.cheap_price else None,
+                            tuple(args.strong_price) if args.strong_price else None)
+    else:
+        record = run_suite(args.drafter, args.prompt, args.model, args.runs, cases, args.price_in, args.price_out)
     if args.out:  # save before printing, so a closed pipe can't lose a paid-for run
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         Path(args.out).write_text(json.dumps(record, indent=1))
