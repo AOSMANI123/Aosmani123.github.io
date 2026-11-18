@@ -262,3 +262,33 @@ class AgreementTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FailureTrackingTests(unittest.TestCase):
+    """A call that fails must show up in the failure rate, not vanish or crash the run."""
+
+    def test_failed_calls_are_counted_by_kind(self):
+        cases = evals.load_cases()[:4]
+        kinds = iter(["api_error", "refusal", "truncated", None])
+
+        def fake(name, case, prompt, model, run):
+            kind = next(kinds)
+            out = {} if kind else evals.mock_faithful(case, prompt)
+            return out, {"input_tokens": 10, "output_tokens": 5, "seconds": 1.0, "failure": kind}
+
+        real = evals.call_drafter
+        evals.call_drafter = fake
+        try:
+            rec = evals.run_suite("mock-faithful", str(HERE / "prompts" / "flag_gaps.txt"), cases=cases)
+        finally:
+            evals.call_drafter = real
+        s = rec["runs"][0]["summary"]
+        self.assertEqual((s["api_errors"], s["refusals"], s["truncated"]), (1, 1, 1))
+        self.assertEqual(s["failed_calls"], 3)
+        self.assertAlmostEqual(s["failure_rate"], 0.75)
+        self.assertEqual([r["failure"] for r in rec["runs"][0]["results"]],
+                         ["api_error", "refusal", "truncated", None])
+
+    def test_old_run_files_without_failure_fields_still_load(self):
+        old = {"runs": [{"summary": {"fabricated": 1}}]}
+        self.assertEqual(evals._metric(old, "failure_rate"), [0])

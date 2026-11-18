@@ -169,6 +169,19 @@ class Summary:
     blank_wording: int
     parse_errors: int
     cases: int
+    api_errors: int = 0      # the call itself failed (network, rate limit, server error)
+    refusals: int = 0        # the model declined to answer
+    truncated: int = 0       # the reply hit max_tokens before the JSON closed
+
+    @property
+    def failed_calls(self) -> int:
+        """Cases with no usable briefing: an API error, a refusal, a cut-off reply or
+        unreadable JSON. These are counted once each, whatever went wrong."""
+        return self.parse_errors
+
+    @property
+    def failure_rate(self) -> float:
+        return self.failed_calls / self.cases if self.cases else 0.0
 
     @property
     def recall(self) -> float:
@@ -179,7 +192,8 @@ class Summary:
         return self.fabricated / self.unknown_total if self.unknown_total else 0.0
 
 
-def summarize(results: list[CaseResult], cases: list[Case]) -> Summary:
+def summarize(results: list[CaseResult], cases: list[Case],
+              failures: list[str | None] | None = None) -> Summary:
     ids = {r.case_id for r in results}
     cases = [c for c in cases if c.id in ids]
     return Summary(
@@ -194,11 +208,16 @@ def summarize(results: list[CaseResult], cases: list[Case]) -> Summary:
         blank_wording=sum(1 for r in results for f in r.fields if f.blank_wording),
         parse_errors=sum(1 for r in results if r.parse_error),
         cases=len(results),
+        api_errors=sum(1 for f in failures or [] if f == "api_error"),
+        refusals=sum(1 for f in failures or [] if f == "refusal"),
+        truncated=sum(1 for f in failures or [] if f == "truncated"),
     )
 
 
 # ---------- drafters ----------
-# Each drafter returns (output_dict, usage). usage has input_tokens, output_tokens, seconds.
+# Each drafter returns (output_dict, usage). usage has input_tokens, output_tokens, seconds,
+# and failure: None, "api_error", "refusal" or "truncated". A failed call returns {} as its
+# output, so the scorer counts it as a parse error and every field as missed or blank.
 
 def mock_faithful(case: Case, prompt: str) -> dict:
     """Uses the answer key. Exists only to prove the scorer gives a perfect drafter 100%."""
@@ -242,20 +261,38 @@ def _json_from(text: str) -> dict:
         return {}
 
 
+MAX_TOKENS = 4000  # room for adaptive thinking plus the JSON; 800 cut some replies off
+EFFORT: str | None = None  # set by --effort; None keeps each model's default
+
+
 def anthropic_drafter(case: Case, prompt: str, model: str) -> tuple[dict, dict]:
     try:
         import anthropic  # pip install anthropic
     except ImportError:
         sys.exit("pip install anthropic, then set ANTHROPIC_API_KEY")
     t = time.monotonic()
-    msg = anthropic.Anthropic().messages.create(
-        model=model, max_tokens=800, system=prompt,
-        messages=[{"role": "user", "content": case.source}],
-    )
+    kwargs = {"output_config": {"effort": EFFORT}} if EFFORT else {}
+    try:
+        msg = anthropic.Anthropic().messages.create(
+            model=model, max_tokens=MAX_TOKENS, system=prompt,
+            messages=[{"role": "user", "content": case.source}], **kwargs,
+        )
+    except (anthropic.AuthenticationError, anthropic.NotFoundError, anthropic.BadRequestError) as e:
+        sys.exit(f"{type(e).__name__}: {e}")  # a setup problem, not a model failure: stop, don't bill on
+    except (anthropic.APIStatusError, anthropic.APIConnectionError):
+        # The SDK has already retried twice. Count it and move on, so one bad call
+        # doesn't end a paid-for run.
+        return {}, {"input_tokens": 0, "output_tokens": 0,
+                    "seconds": time.monotonic() - t, "failure": "api_error"}
+    usage = {"input_tokens": msg.usage.input_tokens, "output_tokens": msg.usage.output_tokens,
+             "seconds": time.monotonic() - t, "failure": None}
+    if msg.stop_reason == "refusal":
+        return {}, {**usage, "failure": "refusal"}
     text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
-    return _json_from(text), {"input_tokens": msg.usage.input_tokens,
-                              "output_tokens": msg.usage.output_tokens,
-                              "seconds": time.monotonic() - t}
+    out = _json_from(text)
+    if not out and msg.stop_reason == "max_tokens":
+        usage["failure"] = "truncated"
+    return out, usage
 
 
 def openai_drafter(case: Case, prompt: str, model: str) -> tuple[dict, dict]:
@@ -290,16 +327,18 @@ def google_drafter(case: Case, prompt: str, model: str) -> tuple[dict, dict]:
 MOCKS = {"mock-faithful": mock_faithful, "mock-fabricator": mock_fabricator, "mock-noisy": mock_noisy}
 APIS = {"anthropic": anthropic_drafter, "openai": openai_drafter, "google": google_drafter}
 DRAFTERS = {**MOCKS, **APIS}
+SEEDED_MOCKS = {"mock-noisy"}  # mocks that take a run number, so repeated runs differ
 
 
 def call_drafter(name: str, case: Case, prompt: str, model: str | None, run: int) -> tuple[dict, dict]:
     if name in APIS:
         if not model:
             sys.exit(f"--model is required for the {name} drafter (use the provider's exact model ID)")
-        return APIS[name](case, prompt, model)
+        out, usage = APIS[name](case, prompt, model)
+        return out, {"failure": None, **usage}
     fn = MOCKS[name]
-    out = fn(case, prompt, run) if name == "mock-noisy" else fn(case, prompt)
-    return out, {"input_tokens": 0, "output_tokens": 0, "seconds": 0.0}
+    out = fn(case, prompt, run) if name in SEEDED_MOCKS else fn(case, prompt)
+    return out, {"input_tokens": 0, "output_tokens": 0, "seconds": 0.0, "failure": None}
 
 
 # ---------- suites of repeated runs ----------
@@ -313,31 +352,39 @@ def run_suite(drafter: str, prompt_path: str, model: str | None = None, runs: in
     record = {"drafter": drafter, "model": model or drafter, "prompt": Path(prompt_path).name,
               "cases": len(cases), "runs": []}
     for i in range(runs):
-        results, usage = [], {"input_tokens": 0, "output_tokens": 0, "seconds": []}
+        results, failures, usage = [], [], {"input_tokens": 0, "output_tokens": 0, "seconds": []}
         for c in cases:
             out, u = call_drafter(drafter, c, prompt, model, i)
             results.append(score_case(c, out))
+            failures.append(u.get("failure"))
             usage["input_tokens"] += u["input_tokens"]
             usage["output_tokens"] += u["output_tokens"]
             usage["seconds"].append(u["seconds"])
-        s = summarize(results, cases)
+        s = summarize(results, cases, failures)
         cost = None
         if price_in is not None and price_out is not None:
             cost = (usage["input_tokens"] * price_in + usage["output_tokens"] * price_out) / 1_000_000
         record["runs"].append({
-            "summary": {**s.__dict__, "recall": s.recall, "fabrication_rate": s.fabrication_rate},
+            "summary": _summary_dict(s),
             "usage": {"input_tokens": usage["input_tokens"], "output_tokens": usage["output_tokens"],
                       "median_seconds_per_case": statistics.median(usage["seconds"]) if usage["seconds"] else 0,
                       "cost_usd": cost},
             "results": [{"case": r.case_id, "invented_numbers": sorted(r.invented_numbers),
-                         "parse_error": r.parse_error, "fields": [f.__dict__ for f in r.fields]}
-                        for r in results],
+                         "parse_error": r.parse_error, "failure": fl,
+                         "fields": [f.__dict__ for f in r.fields]}
+                        for r, fl in zip(results, failures)],
         })
     return record
 
 
+def _summary_dict(s: Summary) -> dict:
+    return {**s.__dict__, "recall": s.recall, "fabrication_rate": s.fabrication_rate,
+            "failed_calls": s.failed_calls, "failure_rate": s.failure_rate}
+
+
 def _metric(record: dict, key: str) -> list[float]:
-    return [r["summary"][key] for r in record["runs"]]
+    # .get: run files saved before a metric existed count it as 0
+    return [r["summary"].get(key, 0) for r in record["runs"]]
 
 
 def _failure_rates(record: dict) -> dict[tuple[str, str], float]:
@@ -442,6 +489,9 @@ def print_suite(record: dict, cases: list[Case]) -> None:
     print(f"carried-over values     : {_mean_range(_metric(record, 'carried_over'))}")
     print(f"cases w/ invented number: {_mean_range(_metric(record, 'invented_number_cases'))}")
     print(f"blanks not worded UNKNOWN: {_mean_range(_metric(record, 'blank_wording'))}  (scored as blanks, not fabrications)")
+    print(f"failure rate            : {_mean_range(_metric(record, 'failure_rate'), True)} of cases gave no usable briefing "
+          f"(of those: API errors {_mean_range(_metric(record, 'api_errors'))}, refusals {_mean_range(_metric(record, 'refusals'))}, "
+          f"cut off {_mean_range(_metric(record, 'truncated'))})")
     if any(r["usage"]["input_tokens"] for r in record["runs"]):
         u = record["runs"]
         print(f"tokens per run          : {statistics.mean(r['usage']['input_tokens'] for r in u):.0f} in / "
@@ -532,8 +582,12 @@ def main(argv=None):
     ap.add_argument("--category", help="only run cases in this category")
     ap.add_argument("--price-in", type=float, help="USD per million input tokens, from the provider's pricing page")
     ap.add_argument("--price-out", type=float, help="USD per million output tokens")
+    ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
+                    help="Anthropic effort level; leave out to use each model's default")
     ap.add_argument("--out", help="write the full run record to this JSON file")
     args = ap.parse_args(argv)
+    global EFFORT
+    EFFORT = args.effort
     if args.category:
         cases = [c for c in cases if c.category == args.category]
     record = run_suite(args.drafter, args.prompt, args.model, args.runs, cases, args.price_in, args.price_out)
