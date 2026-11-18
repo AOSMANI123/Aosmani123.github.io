@@ -67,6 +67,7 @@ class RoutedSuiteTests(unittest.TestCase):
         self.assertEqual(s["to_cheap"] + s["to_strong"], 50)
         self.assertEqual(s["bad_cases"], 0)          # a perfect drafter makes no errors either way
         self.assertEqual(s["fabrication_rate"], 0.0)
+        self.assertEqual(s["pass_rate"], 1.0)
 
     def test_routing_cost_uses_each_tiers_price(self):
         rec = evals.run_routed(("mock-cheap", None), ("mock-strong", None),

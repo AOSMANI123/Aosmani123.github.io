@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4.0] - November 18, 2026
+
+### Added
+- `router.py`: keyword rules that send a request to a cheap model, a strong model, or the strong model plus a flag for a person.
+- `--route` with `--cheap-*` and `--strong-*` drafter, model and price options, so each model is priced separately. Routed runs report where each case went and what the flag caught.
+- `mock-cheap` and `mock-strong`: seeded simulated tiers with assumed error rates, and estimated token counts so routing cost can be compared offline.
+- `estimate`: a floor cost for a run, from text length, before any paid call.
+- Pass rate (briefings with no error) and failure rate (no usable briefing) in every run and in `table`.
+- `--effort` for Anthropic drafters.
+- `docs/cost-and-routing.md`: goal, changes, simulated before and after, tradeoffs, and the real-run plan.
+
+### Changed
+- A failed API call, a refusal or a cut-off reply is now counted and the run carries on, instead of crashing the run or passing as bad output.
+- The Anthropic drafter's reply limit is 4,000 tokens, up from 800, so thinking can't cut off the JSON.
+- Run files saved before a metric existed read it as 0.
+
 ## [0.3.0] - October 31, 2026
 
 ### Added

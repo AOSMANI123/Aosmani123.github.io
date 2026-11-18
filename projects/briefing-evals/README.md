@@ -42,7 +42,8 @@ v2 turns it from a prompt test into a **model-readiness test**: repeated runs, a
 
 ```
 briefing-evals/
-├── evals.py                 # Scorer, drafters, repeated runs, gate, CLI
+├── evals.py                 # Scorer, drafters, repeated runs, gate, routed runs, CLI
+├── router.py                # Sends each request to a cheap or strong model, or flags it
 ├── agreement.py             # Answer key vs. an independent labeler (Cohen's kappa)
 ├── prompts/
 │   ├── naive.txt            # "Fill in the briefing details"
@@ -50,9 +51,11 @@ briefing-evals/
 │   └── flag_gaps_v2.txt     # v2: adds a definition for every field
 ├── cases/                   # 50 fictional requests with answer keys
 ├── labels/                  # Labeling packet, blank sheet, key export (15-case sample)
-├── tests/test_evals.py      # Scorer, answer-key self-checks, gate, agreement math
+├── tests/test_evals.py      # Scorer, answer-key self-checks, gate, agreement math, failure tracking
+├── tests/test_router.py     # Router rules, routed runs, cost estimate
 ├── docs/
 │   ├── readiness-memo.md    # Template for the ship / don't-ship call
+│   ├── cost-and-routing.md  # Can a cheaper model draft the easy briefings? (simulated)
 │   ├── case-study.md        # v1 write-up, including the first real run
 │   ├── metrics.md
 │   └── decisions/
@@ -111,7 +114,13 @@ python3 evals.py calibrate runs/claude-v1.json
 python3 evals.py table runs/*.json                                 # paste into the readiness memo
 ```
 
-Add `--category stale_info` (or any category) to run one trap type.
+Add `--category stale_info` (or any category) to run one trap type. Add `--effort low` (or another level) to set Anthropic's effort; leave it off to use each model's default.
+
+Check the cost first. `estimate` makes no calls and gives a floor; thinking tokens come on top:
+
+```bash
+python3 evals.py estimate --runs 10 --price 2 10 --price 0.10 0.50
+```
 
 ### 4. Check the answer key
 
@@ -145,6 +154,23 @@ Tested on simulated noise with 10 baseline runs, it fails an unchanged prompt ab
 | Flaky | Fails in some runs | Run more before deciding |
 
 In v1, the emcee-as-moderator error persisted under both prompts. It turned out to be a definition problem, not a prompt problem. This grouping makes that call from data.
+
+---
+
+## Cost and routing
+
+`--route` sends each request through [`router.py`](router.py): plain requests go to a cheap model, requests with a known trap go to a strong one, and requests that say a detail changed are drafted by the strong model and flagged for a person. Each model is priced separately.
+
+```bash
+python3 evals.py --route --drafter anthropic \
+    --cheap-model <cheap-id> --cheap-price <in> <out> \
+    --strong-model <strong-id> --strong-price <in> <out> --runs 10 --out runs/routed.json
+python3 evals.py compare runs/all-strong.json runs/routed.json
+```
+
+Every run now also reports a **pass rate** (briefings with no error at all) and a **failure rate** (requests with no usable briefing: an API error, a refusal, a cut-off reply or unreadable output).
+
+In a simulation, routing cut the estimated cost by about a third and failed the gate: fabricated fields more than doubled, because requests that are missing a field read as plain and go to the cheap model. The write-up is in [cost-and-routing.md](docs/cost-and-routing.md). No real model has run through the router yet.
 
 ---
 
@@ -183,6 +209,7 @@ v1 numbers aren't directly comparable to v2. Building v2 showed that the v1 answ
 - All cases are fictional and written by one person with AI help. An AI review checked every key and found no wrong values, but a model checking a key written with a model's help shares its blind spots. The human-labeler check hasn't been run yet.
 - Matching is word-level containment, so it can't catch an invented venue added next to the correct city.
 - It checks the structured fact block, not the prose of the briefing.
+- The router's keywords were written while reading these 50 cases, so they fit this set better than they would fit new requests.
 - Organization and person names are invented. Any match to a real one is unintended.
 
 ---

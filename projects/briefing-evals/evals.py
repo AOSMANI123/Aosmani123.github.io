@@ -180,12 +180,18 @@ class Summary:
     api_errors: int = 0      # the call itself failed (network, rate limit, server error)
     refusals: int = 0        # the model declined to answer
     truncated: int = 0       # the reply hit max_tokens before the JSON closed
+    clean_cases: int = 0     # every field right (or rightly blank) and the reply readable
 
     @property
     def failed_calls(self) -> int:
         """Cases with no usable briefing: an API error, a refusal, a cut-off reply or
         unreadable JSON. These are counted once each, whatever went wrong."""
         return self.parse_errors
+
+    @property
+    def pass_rate(self) -> float:
+        """Share of requests whose whole briefing could go out as drafted."""
+        return self.clean_cases / self.cases if self.cases else 0.0
 
     @property
     def failure_rate(self) -> float:
@@ -219,6 +225,8 @@ def summarize(results: list[CaseResult], cases: list[Case],
         api_errors=sum(1 for f in failures or [] if f == "api_error"),
         refusals=sum(1 for f in failures or [] if f == "refusal"),
         truncated=sum(1 for f in failures or [] if f == "truncated"),
+        clean_cases=sum(1 for r in results if not r.parse_error
+                        and not any(f.outcome in ("fabricated", "wrong", "missed") for f in r.fields)),
     )
 
 
@@ -493,7 +501,7 @@ def run_routed(cheap: tuple[str, str | None], strong: tuple[str, str | None], pr
 
 def _summary_dict(s: Summary) -> dict:
     return {**s.__dict__, "recall": s.recall, "fabrication_rate": s.fabrication_rate,
-            "failed_calls": s.failed_calls, "failure_rate": s.failure_rate}
+            "failed_calls": s.failed_calls, "failure_rate": s.failure_rate, "pass_rate": s.pass_rate}
 
 
 def _metric(record: dict, key: str) -> list[float]:
@@ -603,6 +611,7 @@ def print_suite(record: dict, cases: list[Case]) -> None:
     print(f"carried-over values     : {_mean_range(_metric(record, 'carried_over'))}")
     print(f"cases w/ invented number: {_mean_range(_metric(record, 'invented_number_cases'))}")
     print(f"blanks not worded UNKNOWN: {_mean_range(_metric(record, 'blank_wording'))}  (scored as blanks, not fabrications)")
+    print(f"pass rate               : {_mean_range(_metric(record, 'pass_rate'), True)} of cases had no error at all")
     print(f"failure rate            : {_mean_range(_metric(record, 'failure_rate'), True)} of cases gave no usable briefing "
           f"(of those: API errors {_mean_range(_metric(record, 'api_errors'))}, refusals {_mean_range(_metric(record, 'refusals'))}, "
           f"cut off {_mean_range(_metric(record, 'truncated'))})")
@@ -660,15 +669,17 @@ def print_compare(base: dict, cand: dict, cases: list[Case]) -> bool:
 
 
 def print_table(records: list[dict]) -> None:
-    print("| Model | Prompt | Runs | Recall | Fabrication rate | Carried over | Invented numbers | Cost per run | Median s/case |")
-    print("|---|---|---|---|---|---|---|---|---|")
+    print("| Model | Prompt | Runs | Pass rate | Recall | Fabrication rate | Failure rate | Carried over | Invented numbers | Cost per run | Median s/case |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|")
     for rec in records:
         u = rec["runs"]
         costs = [r["usage"]["cost_usd"] for r in u if r["usage"]["cost_usd"] is not None]
         cost = f"${statistics.mean(costs):.4f}" if costs else "n/a"
         secs = statistics.median(r["usage"]["median_seconds_per_case"] for r in u)
-        print(f"| {rec['model']} | {rec['prompt']} | {len(u)} | {_mean_range(_metric(rec, 'recall'), True)} | "
-              f"{_mean_range(_metric(rec, 'fabrication_rate'), True)} | {_mean_range(_metric(rec, 'carried_over'))} | "
+        print(f"| {rec['model']} | {rec['prompt']} | {len(u)} | {_mean_range(_metric(rec, 'pass_rate'), True)} | "
+              f"{_mean_range(_metric(rec, 'recall'), True)} | "
+              f"{_mean_range(_metric(rec, 'fabrication_rate'), True)} | {_mean_range(_metric(rec, 'failure_rate'), True)} | "
+              f"{_mean_range(_metric(rec, 'carried_over'))} | "
               f"{_mean_range(_metric(rec, 'invented_number_cases'))} | {cost} | {secs:.1f} |")
 
 
