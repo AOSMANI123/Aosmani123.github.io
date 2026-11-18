@@ -2,6 +2,11 @@
 
 All notable changes to the Coverage Gap Detector are documented here.
 
+## [0.1.1] — November 2026
+
+### Changed
+- Two roster entries and the test fixtures now use fictional names and companies.
+
 ## [0.1.0] — October 2026
 
 ### Added

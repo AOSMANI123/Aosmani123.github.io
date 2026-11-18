@@ -65,7 +65,7 @@ A: A story carried by 2 or more sources (configurable via `--consensus-threshold
 A: The architecture separates source sweeping from evaluation. You can replace the RSS sweep with any API that returns headlines, without touching the scoring logic.
 
 **Q: Is this affiliated with any company?**
-A: No. This is independent work using public data only. The sample roster uses S&P 100 CEO names as a demonstration.
+A: No. This is independent work using public data only. The sample roster uses eight public-company CEO names and two fictional examples as a demonstration.
 
 ### Architecture Decision Records
 
@@ -76,7 +76,7 @@ A: No. This is independent work using public data only. The sample roster uses S
 ```
 coverage-gap/
 ├── index.html              # Project page
-├── sample-roster.json      # Sample roster (10 S&P 100 CEOs)
+├── sample-roster.json      # Sample roster (8 public CEOs, 2 fictional)
 ├── README.md               # This file
 ├── CHANGELOG.md            # Version history
 ├── src/
