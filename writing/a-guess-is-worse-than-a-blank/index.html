@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A guess is worse than a blank</title>
+<meta name="description" content="What testing an AI briefing drafter taught Atif Osmani about reading eval metrics: read every failure before trusting the number.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">&#8592; Atif Osmani</a><a href="../../writing/">All writing</a></div>
+    <header class="head">
+      <span class="label">Writing &middot; AI evals</span>
+      <h1>A guess is worse than a blank</h1>
+      <p>What testing an AI briefing drafter taught me about reading metrics.</p>
+      <div class="meta"><span>Written <b>November 2026</b></span><span>Read <b>3 minutes</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <p>The first time I tested an AI tool that drafts briefing facts, the headline said one prompt cut fabrication from 83% to 8%. That number was true, and it was also the least useful thing the test told me.</p>
+  <p>I built the test around twelve fictional event requests. Each one hides a trap: no moderator named, only last year's date, a crowd described as "big" with no number. The model fills in nine fields, like date, moderator and audience size. A field counts as fabricated when the source left it blank and the model filled it anyway.</p>
+
+  <h2>Reading the failures changed the answer</h2>
+  <p>When I read the ten flagged fields from the basic prompt one by one, seven of them were not inventions. The model had declined to guess, but in its own words: "Not specified" or "TBD." My scorer only accepted the exact word UNKNOWN, so it counted honesty as fabrication. The real count was three of twelve, not ten.</p>
+  <p>The three real problems were worth more than the headline:</p>
+  <ul>
+    <li><b>Last year's number:</b> the model carried last year's audience into this year's briefing. My invented-number check missed it, because the number really was in the source, just about a different event.</li>
+    <li><b>No signature:</b> an email signed only by an events team got a team name in the person field.</li>
+    <li><b>The emcee:</b> a person named as the emcee was listed as the moderator, under both prompts.</li>
+  </ul>
+  <p>The stricter prompt fixed the first two. The third survived every prompt, and that told me something a prompt can't fix: the form had no field for an introducer, so the model reached for the nearest one. That's a product decision, not a prompt problem.</p>
+
+  <h2>The tradeoff I chose</h2>
+  <p>The stricter prompt also left four fields blank that the source did state. I kept it anyway. In a briefing, a blank costs a person a minute to fill in. A guess puts a wrong name in front of an executive who will say it out loud.</p>
+
+  <h2>What I do differently now</h2>
+  <ol>
+    <li><b>I read every failure before I trust the metric.</b> A scorer can measure formatting while you think it's measuring honesty.</li>
+    <li><b>I sort failures by what would fix them.</b> Fixed by a prompt means an instruction was missing. Survives every prompt means the schema, the answer key or the model is the problem.</li>
+    <li><b>I measure the tradeoff instead of assuming it.</b> Safer output cost some recall here, and the team should see that number when it decides.</li>
+  </ol>
+  <p>The same rule carries into health care. An AI note that leaves a dose blank gets checked. One that guesses a dose can look right enough to get signed.</p>
+  <p><a href="../../projects/briefing-evals/">See the evals project &rarr;</a></p>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani &middot; independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>

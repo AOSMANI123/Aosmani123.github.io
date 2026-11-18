@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agents people trust start with one rule</title>
+<meta name="description" content="What building a seven-agent system for an executive's office taught Atif Osmani about designing AI agents people trust.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/project.css">
+</head>
+<body>
+<div class="band">
+  <div class="wrap">
+    <div class="top"><a href="../../">&#8592; Atif Osmani</a><a href="../../writing/">All writing</a></div>
+    <header class="head">
+      <span class="label">Writing &middot; AI agents</span>
+      <h1>Agents people trust start with one rule</h1>
+      <p>What building a seven-agent system for an executive's office taught me.</p>
+      <div class="meta"><span>Written <b>November 2026</b></span><span>Read <b>3 minutes</b></span></div>
+    </header>
+  </div>
+</div>
+
+<main class="wrap">
+  <p>Before I designed a single agent, I wrote down one rule: the human is always the final sender. Every other choice in the system came from that sentence.</p>
+  <p>The system handles requests for an executive's time: speaking invitations, customer meetings, events and media asks. It now manages more than 200 of them. Seven agents share the work, and none of them can send anything to anyone.</p>
+
+  <h2>One job per agent</h2>
+  <p>Each agent does one thing, and its limits are part of its design:</p>
+  <ul>
+    <li><b>Intake</b> pulls fields out of a request and makes no judgment about priority. Extract, don't interpret.</li>
+    <li><b>Triage</b> scores each request with a rubric anyone can read. No black-box ranking.</li>
+    <li><b>Scheduling</b> reads the calendar and proposes a slot. It never books.</li>
+    <li><b>The briefing drafter</b> cites a source for every claim and flags any section it can't source.</li>
+    <li><b>The coverage evaluator</b> measures what a briefing missed, not just what it got right.</li>
+  </ul>
+  <p>Narrow jobs made failures easy to find. When a briefing came out wrong, I could tell whether intake misread the request or the drafter reached past its sources. A single do-everything agent would have hidden that.</p>
+
+  <h2>Trust is a design choice</h2>
+  <p>I built the system to be checked. Scores came with their reasons, claims came with their sources, and every output waited for a person. The result I care about most is in the results table: zero messages sent on their own.</p>
+  <p>That rule had a cost. A fully autonomous version would have been faster on paper. But an executive's calendar and words are too consequential to hand over, and a system people don't trust doesn't get used at all.</p>
+
+  <h2>What I chose not to build</h2>
+  <p>Three things I left out on purpose:</p>
+  <ol>
+    <li><b>A custom model.</b> The value was in the workflow, not the model, and fine-tuning would have added months.</li>
+    <li><b>A new interface.</b> The agents work behind the tools the team already used, so nobody had to learn anything new.</li>
+    <li><b>Full autonomy.</b> The agents make the team faster, not independent of it.</li>
+  </ol>
+
+  <h2>What carries over</h2>
+  <p>I'd make the same calls anywhere AI drafts something a person signs: a clinical note, a claim, a patient message. Write the rule first. Give each agent one job. Make every output easy to check. Then measure what the system gets wrong, not just how much it handles.</p>
+  <p><a href="../../projects/agent-system/">See the seven-agent system &rarr;</a></p>
+</main>
+<div class="wrap"><div class="foot"><span>Atif Osmani &middot; independent work, not affiliated with any employer</span><a href="../../">Back to home</a></div></div>
+</body>
+</html>
