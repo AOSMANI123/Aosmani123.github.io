@@ -116,6 +116,7 @@ mark{background:linear-gradient(transparent 14%,var(--mark-bg) 14%,var(--mark-bg
 
 /* decision records */
 .records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:30px}
+.records .record:last-child:nth-child(odd){grid-column:1/-1}
 .record{background:var(--sheet);border:1px solid var(--rule);padding:24px;min-width:0;display:flex;flex-direction:column;gap:14px}
 .record header{display:flex;flex-direction:column;gap:6px}
 .record h3{font-size:1.25rem;line-height:1.25}
