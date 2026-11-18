@@ -92,3 +92,35 @@ class EstimateTests(unittest.TestCase):
         tin, tout = evals.main(["estimate", "--runs", "2", "--price", "1", "1"])
         self.assertGreater(tin, 0)
         self.assertEqual(tout, 50 * 150)
+
+
+class SpendCapTests(unittest.TestCase):
+    def tearDown(self):
+        evals.MAX_SPEND, evals.SPENT = None, 0.0
+        evals.PRICES.clear()
+        evals.APIS.pop("fake", None)
+
+    def test_cap_stops_before_the_next_paid_call(self):
+        calls = []
+
+        def fake(case, prompt, model):
+            calls.append(case.id)
+            return {}, {"input_tokens": 0, "output_tokens": 1_000_000, "seconds": 0.1}
+
+        evals.APIS["fake"] = fake
+        evals.PRICES["m"] = (0.0, 1.0)   # each call costs $1
+        evals.MAX_SPEND = 2.0
+        with self.assertRaises(evals.SpendCapReached):
+            evals.run_suite("fake", str(HERE / "prompts" / "flag_gaps.txt"), "m", 1, evals.load_cases()[:5])
+        self.assertEqual(len(calls), 2)
+
+    def test_cap_needs_a_price(self):
+        evals.APIS["fake"] = lambda c, p, m: ({}, {"input_tokens": 0, "output_tokens": 0, "seconds": 0})
+        evals.MAX_SPEND = 1.0
+        with self.assertRaises(SystemExit):
+            evals.call_drafter("fake", evals.load_cases()[0], "", "unpriced", 0)
+
+    def test_dry_run_needs_no_key_and_writes_a_report(self):
+        import real_run
+        real_run.main(["--dry-run"])
+        self.assertIn("DRY RUN", (HERE / "dry-run-results.md").read_text())

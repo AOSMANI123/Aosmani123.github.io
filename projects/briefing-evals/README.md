@@ -44,6 +44,7 @@ v2 turns it from a prompt test into a **model-readiness test**: repeated runs, a
 briefing-evals/
 ├── evals.py                 # Scorer, drafters, repeated runs, gate, routed runs, CLI
 ├── router.py                # Sends each request to a cheap or strong model, or flags it
+├── real_run.py, run_real.sh # One capped real run of all three setups; key read from the environment only
 ├── agreement.py             # Answer key vs. an independent labeler (Cohen's kappa)
 ├── prompts/
 │   ├── naive.txt            # "Fill in the briefing details"
@@ -169,6 +170,8 @@ python3 evals.py compare runs/all-strong.json runs/routed.json
 ```
 
 Every run now also reports a **pass rate** (briefings with no error at all) and a **failure rate** (requests with no usable briefing: an API error, a refusal, a cut-off reply or unreadable output).
+
+To run the comparison for real with your own Anthropic key, run `bash run_real.sh`. It asks for the key without saving it, stops before any call once $1.95 has been spent, and writes `real-results.md`.
 
 In a simulation, routing cut the estimated cost by about a third and failed the gate: fabricated fields more than doubled, because requests that are missing a field read as plain and go to the cheap model. The write-up is in [cost-and-routing.md](docs/cost-and-routing.md). No real model has run through the router yet.
 

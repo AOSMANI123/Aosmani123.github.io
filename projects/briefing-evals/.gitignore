@@ -1,0 +1,7 @@
+# Never commit keys or local environments
+.env
+*.env
+.venv/
+# Raw run records are large; real-results.md is the summary to keep
+runs/
+dry-run-results.md

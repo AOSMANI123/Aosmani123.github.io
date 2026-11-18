@@ -136,7 +136,7 @@
   <p><strong>Routing saved about a third and failed the gate.</strong> Fabricated fields more than doubled. The reason is the useful part: the most common trap is a field the request never mentions, and a request missing its moderator reads as plain. A keyword router can't see what isn't there, so it sends those to the cheap model, where the guessing happens. The next thing I'd try routes on the draft instead: the cheap model drafts, and the strong model checks only the fields it filled. The full <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/cost-and-routing.md" target="_blank" rel="noopener">write-up</a> has the tradeoffs and the real-run plan.</p>
 
   <h2>Status</h2>
-  <p><span class="pill">Built and tested offline</span> The cases, scorer, gate, router and labeling kit work, and 47 tests pass. Real-model runs across providers, and through the router, are next. The results will go into a one-page <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/readiness-memo.md" target="_blank" rel="noopener">readiness memo</a>: which model and prompt to ship, the evidence, and what would change the call.</p>
+  <p><span class="pill">Built and tested offline</span> The cases, scorer, gate, router and labeling kit work, and 50 tests pass. Real-model runs across providers, and through the router, are next. The results will go into a one-page <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/readiness-memo.md" target="_blank" rel="noopener">readiness memo</a>: which model and prompt to ship, the evidence, and what would change the call.</p>
   <h2>Run it</h2>
 <pre>python3 -m unittest discover -s tests
 python3 evals.py --drafter mock-noisy --runs 10 --out runs/sim.json

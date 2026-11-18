@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file. Format foll
 - `estimate`: a floor cost for a run, from text length, before any paid call.
 - Pass rate (briefings with no error) and failure rate (no usable briefing) in every run and in `table`.
 - `--effort` for Anthropic drafters.
+- `--max-spend`: stops before the next paid call once a spend limit is reached.
+- `run_real.sh` and `real_run.py`: one capped real run of all three setups, writing `real-results.md`. The key is read from the environment only, and `.gitignore` keeps `.env` files and `.venv` out of git.
 - `docs/cost-and-routing.md`: goal, changes, simulated before and after, tradeoffs, and the real-run plan.
 
 ### Changed

@@ -59,26 +59,24 @@ Route by what the draft says, not only by the request. The cheap model drafts fi
 
 ## Real runs: the plan
 
-These need an Anthropic API key and cost real money, so I run them myself. The estimate below is a floor; thinking tokens come on top.
+`run_real.sh` runs all three setups for real, three times each over the 50 made-up cases, with Claude Sonnet 5.5 as the strong model and Claude Haiku 5.5 as the cheap one, both at low effort. It asks for the API key in the terminal without showing or saving it, and stops before any call once $1.95 has been spent. The expected cost is about $1. It writes `real-results.md` with cost per run, pass rate, failure rate, fabrication rate, latency and the gate result.
+
+```
+bash run_real.sh             # real, paid run
+python3 real_run.py --dry-run  # same steps with the simulated models; free, no key
+```
+
+To run the setups by hand instead:
 
 ```
 python3 evals.py estimate --runs 10 --price 2 10 --price 0.10 0.50
-
-# 1. One run first, to check the setup (about $0.10 before thinking tokens)
-python3 evals.py --drafter anthropic --model claude-sonnet-5-5 --price-in 2 --price-out 10 --runs 1
-
-# 2. Baseline: strong model for everything
 python3 evals.py --drafter anthropic --model claude-sonnet-5-5 --price-in 2 --price-out 10 \
-    --runs 10 --out runs/all-strong.json
-
-# 3. Routed
+    --effort low --runs 10 --max-spend 2 --out runs/all-strong.json
 python3 evals.py --route --drafter anthropic \
     --cheap-model claude-haiku-5-5 --cheap-price 0.10 0.50 \
-    --strong-model claude-sonnet-5-5 --strong-price 2 10 --runs 10 --out runs/routed.json
-
-# 4. Compare and gate
+    --strong-model claude-sonnet-5-5 --strong-price 2 10 \
+    --effort low --runs 10 --max-spend 2 --out runs/routed.json
 python3 evals.py compare runs/all-strong.json runs/routed.json
-python3 evals.py table runs/all-strong.json runs/routed.json
 ```
 
 The simulated results come from fixed seeds, so these rebuild the table above exactly:
