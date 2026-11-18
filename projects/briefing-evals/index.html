@@ -122,12 +122,26 @@
   <h2>Checking the answer key</h2>
   <p>An eval is only as good as its answer key, and v1's had a contradiction nobody caught. v2 ships a labeling kit: a second person labels a 15-case sample without seeing the key, and the harness reports Cohen's kappa on "stated vs. not stated." The target is above 0.8. An AI review of all 50 keys found no wrong values and 14 edge cases, which are fixed. The human check is next, because a model reviewing a key written with a model's help shares its blind spots.</p>
 
+  <h2>Can a cheaper model draft the easy ones?</h2>
+  <p>Sending every request to a strong model is safe and expensive. So I added a router. It reads only the request: plain ones go to a cheap model, ones with a known trap go to a strong model, and ones that say a detail changed get the strong model plus a flag for a person. Every run now also reports cost, latency, a pass rate (briefings with no error) and a failure rate (no usable briefing at all).</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Setup</th><th>Pass rate</th><th>Fabrication rate</th><th>Est. cost per run</th></tr></thead>
+    <tbody>
+      <tr><td>Strong model for everything</td><td class="num">82%</td><td class="num">5%</td><td class="num">$0.10</td></tr>
+      <tr><td>Cheap model for everything</td><td class="num">49%</td><td class="num">21%</td><td class="num">$0.005</td></tr>
+      <tr><td>Routed: 17 cheap, 33 strong</td><td class="num">70%</td><td class="num">12%</td><td class="num">$0.07</td></tr>
+    </tbody>
+  </table></div>
+  <p>Ten runs each, from a simulation with error rates I chose, priced at Anthropic's November 2026 list prices with token counts estimated from text length. It shows the harness working, not how any real model behaves.</p>
+  <p><strong>Routing saved about a third and failed the gate.</strong> Fabricated fields more than doubled. The reason is the useful part: the most common trap is a field the request never mentions, and a request missing its moderator reads as plain. A keyword router can't see what isn't there, so it sends those to the cheap model, where the guessing happens. The next thing I'd try routes on the draft instead: the cheap model drafts, and the strong model checks only the fields it filled. The full <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/cost-and-routing.md" target="_blank" rel="noopener">write-up</a> has the tradeoffs and the real-run plan.</p>
+
   <h2>Status</h2>
-  <p><span class="pill">Built and tested offline</span> The cases, scorer, gate and labeling kit work, and 33 tests pass. Real-model runs across providers are next. The results will go into a one-page <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/readiness-memo.md" target="_blank" rel="noopener">readiness memo</a>: which model and prompt to ship, the evidence, and what would change the call.</p>
+  <p><span class="pill">Built and tested offline</span> The cases, scorer, gate, router and labeling kit work, and 47 tests pass. Real-model runs across providers, and through the router, are next. The results will go into a one-page <a href="https://github.com/AOSMANI123/briefing-evals/blob/main/docs/readiness-memo.md" target="_blank" rel="noopener">readiness memo</a>: which model and prompt to ship, the evidence, and what would change the call.</p>
   <h2>Run it</h2>
 <pre>python3 -m unittest discover -s tests
 python3 evals.py --drafter mock-noisy --runs 10 --out runs/sim.json
 python3 evals.py calibrate runs/sim.json
+python3 evals.py estimate --runs 10 --price 2 10 --price 0.10 0.50
 
 python3 evals.py --drafter anthropic --model &lt;id&gt; --prompt prompts/flag_gaps.txt --runs 10 --out runs/base.json
 python3 evals.py --drafter anthropic --model &lt;id&gt; --prompt prompts/flag_gaps_v2.txt --runs 3 --out runs/cand.json
@@ -137,6 +151,7 @@ python3 evals.py table runs/*.json</pre>
   <h2>Limits</h2>
   <ul>
     <li>Fabrication coverage leans on one field: 26 of the 49 gaps are the moderator. Event name and ask are never missing. Read fabrication per field before drawing conclusions.</li>
+    <li>The router's keywords were written while reading these 50 cases, so they fit this set better than new requests. No real model or real user has been through the router yet.</li>
     <li>All 50 cases were written by one person with AI help. The human labeler check hasn't run yet.</li>
     <li>Matching is word-level containment, so it can't catch an invented venue added next to the correct city.</li>
     <li>It checks the fact block, not the prose of the briefing.</li>
