@@ -1,5 +1,7 @@
 # Executive Writing Critic
 
+![Real output of the critic on a short sample memo: an overall D grade with line-level findings](docs/critic-output.svg)
+
 ## Problem
 
 People who write executive documents — strategy briefs, decision memos, launch reviews — get feedback that's either too vague ("make it crisper") or too late (after the meeting). There's no fast, concrete way to check whether a document meets the bar before it goes out. The cost is wasted review cycles, buried asks that don't get funded, and memos that executives stop reading halfway through.

@@ -29,7 +29,7 @@ from detector import (
 
 SAMPLE_ROSTER = [
     {"name": "Tim Cook", "aliases": ["Timothy Cook"], "company": "Apple"},
-    {"name": "Satya Nadella", "aliases": [], "company": "Microsoft"},
+    {"name": "Lisa Su", "aliases": [], "company": "AMD"},
     {"name": "Jensen Huang", "aliases": [], "company": "NVIDIA"},
 ]
 
@@ -70,7 +70,7 @@ class TestEntityNames(unittest.TestCase):
     def test_includes_primary_names(self):
         names = entity_names(SAMPLE_ROSTER)
         self.assertIn("Tim Cook", names)
-        self.assertIn("Satya Nadella", names)
+        self.assertIn("Lisa Su", names)
 
     def test_includes_aliases(self):
         names = entity_names(SAMPLE_ROSTER)
@@ -79,7 +79,7 @@ class TestEntityNames(unittest.TestCase):
     def test_includes_companies(self):
         names = entity_names(SAMPLE_ROSTER)
         self.assertIn("Apple", names)
-        self.assertIn("Microsoft", names)
+        self.assertIn("AMD", names)
 
 
 # ---------------------------------------------------------------------------
@@ -112,23 +112,23 @@ class TestDedup(unittest.TestCase):
         headlines = [
             {"title": "Apple announces new iPhone", "matched_entities": ["Apple"],
              "source_name": "Reuters"},
-            {"title": "Microsoft launches new cloud service",
-             "matched_entities": ["Microsoft"], "source_name": "Reuters"},
+            {"title": "AMD launches new data center chip",
+             "matched_entities": ["AMD"], "source_name": "Reuters"},
         ]
         clusters = deduplicate(headlines)
         self.assertEqual(len(clusters), 2)
 
     def test_entity_merging_in_clusters(self):
         headlines = [
-            {"title": "Apple and Microsoft partner on AI",
+            {"title": "Apple and AMD partner on AI",
              "matched_entities": ["Apple"], "source_name": "Reuters"},
-            {"title": "Apple and Microsoft partner on AI project",
-             "matched_entities": ["Apple", "Microsoft"], "source_name": "CNBC"},
+            {"title": "Apple and AMD partner on AI project",
+             "matched_entities": ["Apple", "AMD"], "source_name": "CNBC"},
         ]
         clusters = deduplicate(headlines)
         self.assertEqual(len(clusters), 1)
         self.assertIn("Apple", clusters[0]["matched_entities"])
-        self.assertIn("Microsoft", clusters[0]["matched_entities"])
+        self.assertIn("AMD", clusters[0]["matched_entities"])
 
     def test_empty_input(self):
         self.assertEqual(deduplicate([]), [])
@@ -196,8 +196,8 @@ class TestEvaluateBrief(unittest.TestCase):
         self.stories = [
             make_story("Tim Cook announces Apple Vision Pro sales",
                        ["Tim Cook", "Apple"], source_count=3),
-            make_story("Satya Nadella keynotes Microsoft Build conference",
-                       ["Satya Nadella", "Microsoft"], source_count=2),
+            make_story("Lisa Su keynotes AMD Advancing AI conference",
+                       ["Lisa Su", "AMD"], source_count=2),
             make_story("Jensen Huang reveals NVIDIA next-gen GPU",
                        ["Jensen Huang", "NVIDIA"], source_count=4),
         ]
@@ -205,7 +205,7 @@ class TestEvaluateBrief(unittest.TestCase):
     def test_full_coverage(self):
         brief = (
             "Tim Cook announced Apple Vision Pro sales figures today. "
-            "Satya Nadella keynotes Microsoft Build conference. "
+            "Lisa Su keynotes AMD Advancing AI conference. "
             "Jensen Huang reveals NVIDIA next-gen GPU architecture."
         )
         result = evaluate_brief(brief, self.stories, SAMPLE_ROSTER)
@@ -245,8 +245,8 @@ class TestEvaluateBrief(unittest.TestCase):
         ec = result["entity_coverage"]
         self.assertEqual(ec["Tim Cook"]["available"], 1)
         self.assertEqual(ec["Tim Cook"]["covered"], 1)
-        self.assertEqual(ec["Satya Nadella"]["available"], 1)
-        self.assertEqual(ec["Satya Nadella"]["covered"], 0)
+        self.assertEqual(ec["Lisa Su"]["available"], 1)
+        self.assertEqual(ec["Lisa Su"]["covered"], 0)
 
     def test_dedup_stats(self):
         result = evaluate_brief("anything", self.stories, SAMPLE_ROSTER)

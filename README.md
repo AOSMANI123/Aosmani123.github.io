@@ -2,7 +2,7 @@
 
 **Live site: [aosmani123.github.io](https://aosmani123.github.io)**
 
-I build AI systems and operating models for executive teams. I've spent five years supporting senior executives at Amazon and Microsoft, and I came to tech through Microsoft's ACE rotation program in product marketing and product research. I start by talking to the people doing the work, find the real constraint, and build around it.
+I build AI systems people can trust, and the evals that prove it. I'm looking for product and product marketing roles in health tech and AI in New York. I've spent five years supporting senior executives at Amazon and Microsoft, and I came to tech through Microsoft's ACE rotation program in product marketing and product research. I start by talking to the people doing the work, find the real constraint, and build around it.
 
 This repo is my personal site and the projects on it.
 

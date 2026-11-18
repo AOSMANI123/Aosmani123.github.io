@@ -4,7 +4,7 @@ All notable changes to the seven-agent engagement system.
 
 > Independent work. Not affiliated with any employer.
 
-## [1.0.0] — 2025
+## [1.0.0] — 2026
 
 ### Added
 
