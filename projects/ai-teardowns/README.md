@@ -17,8 +17,8 @@ The teardowns cover ChatGPT, GitHub Copilot, Notion AI, Midjourney, and Grammarl
 **Q: Why teardowns instead of case studies?**
 A case study describes what happened. A teardown takes a position on what should happen next. The goal is to practice the kind of thinking a PM does every day: look at a product, form a hypothesis about what's working and what isn't, and name the bet you'd make.
 
-**Q: Why these five products?**
-They represent different stages and strategies in AI product development. ChatGPT is a general-purpose tool trying to find specific use cases. Copilot is AI embedded in an existing workflow. Notion AI is AI bolted onto a platform. Midjourney is an AI-native product with an unconventional distribution channel. Grammarly is a pre-AI product adding AI capabilities. Each one surfaces different product problems.
+**Q: Why these products?**
+The first five represent different stages and strategies in AI product development. ChatGPT is a general-purpose tool trying to find specific use cases. Copilot is AI embedded in an existing workflow. Notion AI is AI bolted onto a platform. Midjourney is an AI-native product with an unconventional distribution channel. Grammarly is a pre-AI product adding AI capabilities. Each one surfaces different product problems. Abridge, added in November 2026, brings in health care, where an AI draft is something a clinician signs.
 
 **Q: How are the metrics trees constructed?**
 By working backward from what the company likely optimizes for (revenue, engagement, retention) and decomposing into the driver and input metrics that a product team can actually influence. The trees are hypothesized, not sourced from internal data.
