@@ -386,11 +386,31 @@ SEEDED_MOCKS = {"mock-noisy", "mock-cheap", "mock-strong"}  # take a run number,
 SIMULATED = {"mock-cheap", "mock-strong"}  # report estimated tokens, so routing cost can be compared
 
 
+class SpendCapReached(Exception):
+    pass
+
+
+# A running total of paid spend, so a real run can't cost more than --max-spend.
+# PRICES maps model ID -> (USD in, USD out) per million tokens, set from the CLI.
+PRICES: dict[str, tuple[float, float]] = {}
+MAX_SPEND: float | None = None
+SPENT = 0.0
+
+
 def call_drafter(name: str, case: Case, prompt: str, model: str | None, run: int) -> tuple[dict, dict]:
+    global SPENT
     if name in APIS:
         if not model:
             sys.exit(f"--model is required for the {name} drafter (use the provider's exact model ID)")
+        if MAX_SPEND is not None:
+            if model not in PRICES:
+                sys.exit(f"--max-spend needs a price for {model}")
+            if SPENT >= MAX_SPEND:
+                raise SpendCapReached(f"spent ${SPENT:.2f}, cap is ${MAX_SPEND:.2f}")
         out, usage = APIS[name](case, prompt, model)
+        if model in PRICES:
+            pin, pout = PRICES[model]
+            SPENT += (usage["input_tokens"] * pin + usage["output_tokens"] * pout) / 1_000_000
         return out, {"failure": None, **usage}
     fn = MOCKS[name]
     out = fn(case, prompt, run) if name in SEEDED_MOCKS else fn(case, prompt)
@@ -740,28 +760,43 @@ def main(argv=None):
     ap.add_argument("--strong-drafter", help="drafter for hard and flagged requests (default: --drafter)")
     ap.add_argument("--strong-model", help="model for hard and flagged requests")
     ap.add_argument("--strong-price", type=float, nargs=2, metavar=("IN", "OUT"), help="USD per million tokens")
+    ap.add_argument("--max-spend", type=float,
+                    help="stop before any call once this many USD have been spent in this command")
     ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
                     help="Anthropic effort level; leave out to use each model's default")
     ap.add_argument("--out", help="write the full run record to this JSON file")
     args = ap.parse_args(argv)
-    global EFFORT
+    global EFFORT, MAX_SPEND
     EFFORT = args.effort
+    MAX_SPEND = args.max_spend
+    if args.model and args.price_in is not None and args.price_out is not None:
+        PRICES[args.model] = (args.price_in, args.price_out)
+    if args.cheap_model and args.cheap_price:
+        PRICES[args.cheap_model] = tuple(args.cheap_price)
+    if args.strong_model and args.strong_price:
+        PRICES[args.strong_model] = tuple(args.strong_price)
     if args.category:
         cases = [c for c in cases if c.category == args.category]
-    if args.route:
-        record = run_routed((args.cheap_drafter or args.drafter, args.cheap_model),
-                            (args.strong_drafter or args.drafter, args.strong_model),
-                            args.prompt, args.runs, cases,
-                            tuple(args.cheap_price) if args.cheap_price else None,
-                            tuple(args.strong_price) if args.strong_price else None)
-    else:
-        record = run_suite(args.drafter, args.prompt, args.model, args.runs, cases, args.price_in, args.price_out)
+    try:
+        record = _run(args, cases)
+    except SpendCapReached as e:
+        sys.exit(f"Stopped before the next paid call: {e}. Nothing from this command was saved.")
     if args.out:  # save before printing, so a closed pipe can't lose a paid-for run
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         Path(args.out).write_text(json.dumps(record, indent=1))
     print_suite(record, cases)
     s = record["runs"][-1]["summary"]
     return Summary(**{k: v for k, v in s.items() if k in Summary.__dataclass_fields__})
+
+
+def _run(args, cases: list[Case]) -> dict:
+    if args.route:
+        return run_routed((args.cheap_drafter or args.drafter, args.cheap_model),
+                          (args.strong_drafter or args.drafter, args.strong_model),
+                          args.prompt, args.runs, cases,
+                          tuple(args.cheap_price) if args.cheap_price else None,
+                          tuple(args.strong_price) if args.strong_price else None)
+    return run_suite(args.drafter, args.prompt, args.model, args.runs, cases, args.price_in, args.price_out)
 
 
 if __name__ == "__main__":
